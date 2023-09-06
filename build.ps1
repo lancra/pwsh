@@ -159,7 +159,11 @@ function Analyze {
     [CmdletBinding()]
     param()
     process {
-        $analysis = Invoke-ScriptAnalyzer -Path $sut -Recurse -Verbose:$false
+        $analysisSettings = @{
+            ExcludeRules = @('PSAvoidUsingWriteHost')
+        }
+
+        $analysis = Invoke-ScriptAnalyzer -Path $sut -Recurse -Settings $analysisSettings -Verbose:$false
         $errors = $analysis | Where-Object { $_.Severity -eq 'Error' }
         $warnings = $analysis | Where-Object { $_.Severity -eq 'Warning' }
 

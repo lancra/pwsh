@@ -5,7 +5,9 @@
     Author = 'Lance Craig'
     PowerShellVersion = '7.0'
     Description = "Lance's general-use scripts."
-    FunctionsToExport = @()
+    FunctionsToExport = @(
+        'Write-GitRepositoryDetail'
+    )
     VariablesToExport = 'Lance'
     PrivateData = @{
         PSData = @{

@@ -5,7 +5,14 @@ BeforeAll {
     $artifactsModuleDirectory = Join-Path -Path $artifactsDirectory -ChildPath $env:BHProjectName
     $artifactsModuleVersionDirectory = Join-Path -Path $artifactsModuleDirectory -ChildPath $manifest.ModuleVersion
     $artifactsManifestPath = Join-Path -Path $artifactsModuleVersionDirectory -Child "$($moduleName).psd1"
-    $script:manifestData = Test-ModuleManifest -Path $artifactsManifestPath -Verbose:$false -ErrorAction Stop -WarningAction SilentlyContinue
+
+    $manifestDataParams = @{
+        ErrorAction = 'Stop'
+        Path = $artifactsManifestPath
+        Verbose = $false
+        WarningAction = 'SilentlyContinue'
+    }
+    $script:manifestData = Test-ModuleManifest @manifestDataParams
 
     $changelogPath = Join-Path -Path $env:BHProjectPath -Child 'CHANGELOG.md'
     $script:changelogVersion = Get-Content $changelogPath |
