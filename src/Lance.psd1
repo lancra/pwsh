@@ -6,6 +6,7 @@
     PowerShellVersion = '7.0'
     Description = "Lance's general-use scripts."
     FunctionsToExport = @(
+        'Invoke-SubDirectoryGitCommand',
         'Write-GitRepositoryDetail'
     )
     VariablesToExport = 'Lance'
