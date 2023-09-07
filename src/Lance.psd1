@@ -12,7 +12,7 @@
     VariablesToExport = 'Lance'
     PrivateData = @{
         PSData = @{
-            Prerelease = 'preview0'
+            Prerelease = 'preview1'
             ReleaseNotes = 'https://raw.githubusercontent.com/lancra/pwsh/main/CHANGELOG.md'
             LicenseUri = 'https://raw.githubusercontent.com/lancra/pwsh/main/LICENSE'
             ProjectUri = 'https://github.com/lancra/pwsh'
