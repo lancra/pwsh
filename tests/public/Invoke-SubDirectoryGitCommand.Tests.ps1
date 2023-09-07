@@ -1,6 +1,6 @@
 BeforeAll {
     function New-TemporaryDirectory {
-        $path = Join-Path -Path $env:Temp -ChildPath (New-Guid).Guid
+        $path = Join-Path -Path ([System.IO.Path]::GetTempPath()) -ChildPath (New-Guid).Guid
         New-Item -ItemType Directory -Path $path > $null
         $path
     }

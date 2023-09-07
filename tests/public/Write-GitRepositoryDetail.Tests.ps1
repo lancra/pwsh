@@ -1,13 +1,15 @@
 BeforeAll {
     function New-TemporaryDirectory {
-        $path = Join-Path -Path $env:Temp -ChildPath (New-Guid).Guid
+        $path = Join-Path -Path ([System.IO.Path]::GetTempPath()) -ChildPath (New-Guid).Guid
         New-Item -ItemType Directory -Path $path > $null
         $path
     }
 
     # Setup remote repository.
     $remoteTemplatePath = New-TemporaryDirectory
-    git -C $remoteTemplatePath init
+    git -C $remoteTemplatePath init --initial-branch=main
+    git -C $remoteTemplatePath config --local user.email "testuser@example.org"
+    git -C $remoteTemplatePath config --local user.name "Test User"
 
     'foo' > (Join-Path -Path $remoteTemplatePath -ChildPath 'foo.txt')
     git -C $remoteTemplatePath add 'foo.txt'
@@ -26,6 +28,8 @@ Describe 'Expected Output' {
 
         $localPath = New-TemporaryDirectory
         git clone "$remotePath/.git" $localPath *> $null
+        git -C $localPath config --local user.email "testuser@example.org"
+        git -C $localPath config --local user.name "Test User"
 
         Mock Write-Host -ModuleName Lance
     }
