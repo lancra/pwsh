@@ -1,9 +1,5 @@
 BeforeAll {
-    function New-TemporaryDirectory {
-        $path = Join-Path -Path ([System.IO.Path]::GetTempPath()) -ChildPath (New-Guid).Guid
-        New-Item -ItemType Directory -Path $path > $null
-        $path
-    }
+    . $PSScriptRoot/../testing/New-TemporaryDirectory.ps1
 
     # Setup remote repository.
     $remoteTemplatePath = New-TemporaryDirectory
