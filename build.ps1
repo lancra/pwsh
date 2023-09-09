@@ -20,8 +20,8 @@ $artifactsManifest = Join-Path -Path $artifactsModuleVersionDirectory -ChildPath
 
 $PSDefaultParameterValues = @{
     'Get-Module:Verbose' = $false
-    'Remove-Module:Verbose' = $false
     'Import-Module:Verbose' = $false
+    'Remove-Module:Verbose' = $false
 }
 
 if ($Bootstrap) {
@@ -43,40 +43,42 @@ class DependsOn : System.Attribute {
         $this.Name = $name
     }
 }
+
+<#
+.SYNOPSIS
+Runs a command, taking care to run it's dependencies first
+.DESCRIPTION
+Invoke-Step supports the [DependsOn("...")] attribute to allow you to write tasks or build steps that take dependencies on other tasks
+completing first.
+
+When you invoke a step, dependencies are run first, recursively. The algorithm for this is depth-first and *very* naive. Don't build
+cycles!
+.EXAMPLE
+function init {
+    param()
+    Write-Information "INITIALIZING build variables"
+}
+
+function update {
+    [DependsOn("init")]param()
+    Write-Information "UPDATING dependencies"
+}
+
+function build {
+    [DependsOn(("update","init"))]param()
+    Write-Information "BUILDING: $ModuleName from $Path"
+}
+
+Invoke-Step build -InformationAction continue
+
+Defines three steps with dependencies, and invokes the "build" step.
+Results in this output:
+
+Invoking Step: init
+Invoking Step: update
+Invoking Step: build
+#>
 function Invoke-Step {
-    <#
-        .SYNOPSIS
-            Runs a command, taking care to run it's dependencies first
-        .DESCRIPTION
-            Invoke-Step supports the [DependsOn("...")] attribute to allow you to write tasks or build steps that take dependencies on other tasks completing first.
-
-            When you invoke a step, dependencies are run first, recursively. The algorithm for this is depth-first and *very* naive. Don't build cycles!
-       .EXAMPLE
-            function init {
-                param()
-                Write-Information "INITIALIZING build variables"
-            }
-
-            function update {
-                [DependsOn("init")]param()
-                Write-Information "UPDATING dependencies"
-            }
-
-            function build {
-                [DependsOn(("update","init"))]param()
-                Write-Information "BUILDING: $ModuleName from $Path"
-            }
-
-            Invoke-Step build -InformationAction continue
-
-            Defines three steps with dependencies, and invokes the "build" step.
-            Results in this output:
-
-            Invoking Step: init
-            Invoking Step: update
-            Invoking Step: build
-
-    #>
     [CmdletBinding()]
     param(
         [string]$Step,
