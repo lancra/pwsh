@@ -12,6 +12,8 @@
     FunctionsToExport = @(
         'Invoke-SubDirectoryGitCommand',
         'Remove-BuildArtifact',
+        'Resolve-Error',
+        'Stop-Wsl',
         'Write-GitRepositoryDetail'
     )
     VariablesToExport = 'Lance'
