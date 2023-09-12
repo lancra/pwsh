@@ -15,4 +15,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add Resolve-Error function (#3).
 - Add Stop-Wsl function (#3).
 
-[unreleased]: https://github.com/lancra/pwsh/compare/v0.1.0-preview-0...HEAD
+[unreleased]: https://github.com/lancra/pwsh/compare/v0.1.0-preview0...HEAD

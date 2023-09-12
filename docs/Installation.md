@@ -26,11 +26,17 @@
 
    ```powershell
    $modulePath = Join-Path -Path '<GIT_REPOSITORY_ROOT_PATH>' -ChildPath 'artifacts' -AdditionalChildPath 'Lance'
-   Publish-Module -Path $modulePath -Repository '<POWERSHELL_REPOSITORY_NAME>'
+   Publish-Module -Path $modulePath -Repository 'Local'
    ```
 
 1. Install the module from the repository.
 
    ```powershell
    Install-Module -Name 'Lance' -Repository 'Local'
+   ```
+
+1. Import the module as part of your PowerShell profile.
+
+   ```powershell
+   Import-Module -Name 'Lance'
    ```
