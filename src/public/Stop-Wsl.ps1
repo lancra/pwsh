@@ -3,27 +3,31 @@
 Force stops Windows Subsystem for Linux.
 
 .DESCRIPTION
-Kills all processes associated with WSL, initiates a shutdown via WSL, then
-kills the WSL process again.
+Stops all processes associated with WSL, initiates a shutdown via WSL, then
+stops the WSL service process again.
 
 .LINK
 https://github.com/microsoft/WSL/issues/8529#issuecomment-1623852490
 #>
 function Stop-Wsl {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     param()
     process {
         if (-not $IsWindows) {
-            throw 'WSL can only be stopped from a Windows OS.'
+            throw 'WSL can only be stopped from Windows.'
         }
 
-        #Requires -RunAsAdministrator
-        taskkill /f /im wsl.exe
-        taskkill /f /im wslhost.exe
-        taskkill /f /im wslservice.exe
+        [Security.Principal.WindowsPrincipal] $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
+        if (-not $currentUser.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+            throw 'Adminstrator permissions are required to stop processes.'
+        }
+
+        Get-Process -Name 'wsl' -ErrorAction Ignore | Stop-Process
+        Get-Process -Name 'wslhost' -ErrorAction Ignore | Stop-Process
+        Get-Process -Name 'wslservice' -ErrorAction Ignore | Stop-Process
 
         wsl --shutdown
 
-        taskkill /f /im wslservice.exe
+        Get-Process -Name 'wslservice' -ErrorAction Ignore | Stop-Process
     }
 }
