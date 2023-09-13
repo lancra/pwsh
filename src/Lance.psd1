@@ -12,12 +12,14 @@
     FunctionsToExport = @(
         'Invoke-SubDirectoryGitCommand',
         'Remove-BuildArtifact',
+        'Resolve-Error',
+        'Stop-Wsl',
         'Write-GitRepositoryDetail'
     )
     VariablesToExport = 'Lance'
     PrivateData = @{
         PSData = @{
-            Prerelease = 'preview2'
+            Prerelease = 'preview3'
             ReleaseNotes = 'https://raw.githubusercontent.com/lancra/pwsh/main/CHANGELOG.md'
             LicenseUri = 'https://raw.githubusercontent.com/lancra/pwsh/main/LICENSE'
             ProjectUri = 'https://github.com/lancra/pwsh'

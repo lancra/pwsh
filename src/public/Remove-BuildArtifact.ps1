@@ -1,3 +1,13 @@
+<#
+.SYNOPSIS
+Recursively removes all build artifact directories from a path.
+
+.DESCRIPTION
+For a given directory, removes all "artifacts", "bin", and "obj" folders.
+
+.PARAMETER Path
+The path to remove build artifact directories from.
+#>
 function Remove-BuildArtifact {
     [CmdletBinding(SupportsShouldProcess)]
     param(
