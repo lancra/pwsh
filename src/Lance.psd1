@@ -14,6 +14,7 @@
         'Remove-BuildArtifact',
         'Resolve-Error',
         'Stop-Wsl',
+        'Test-PathExecutable',
         'Write-GitRepositoryDetail'
     )
     VariablesToExport = 'Lance'
