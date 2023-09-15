@@ -3,11 +3,14 @@
 [CmdletBinding()]
 param(
     # Build task(s) to execute
-    [ValidateSet('Init', 'Clean', 'Build', 'Analyze', 'Pester', 'Test')]
+    [ValidateSet('Init', 'Clean', 'Build', 'Analyze', 'Import', 'Pester', 'Hack', 'Test')]
     [string]$Task = 'Test',
 
     # Bootstrap dependencies
-    [switch]$Bootstrap
+    [switch]$Bootstrap,
+
+    # Executed for continuous integration
+    [switch]$CI
 )
 
 $sut = Join-Path -Path $PSScriptRoot -ChildPath 'src'
@@ -185,17 +188,33 @@ function Analyze {
     }
 }
 
-function Pester {
+function Import {
     [DependsOn('Init')]
     [CmdletBinding()]
     param()
     process {
         Import-Module -Name $artifactsManifest -Force
+    }
+}
+
+function Pester {
+    [DependsOn('Import')]
+    [CmdletBinding()]
+    param()
+    process {
+        Import-Module -Name $artifactsManifest -Force
+
+        $excludedTags = @()
+
+        if ($CI) {
+            $excludedTags = @('Windows')
+        }
 
         $pesterParams = @{
             Path = './tests'
             Output = 'Detailed'
             PassThru = $true
+            ExcludeTagFilter = $excludedTags
         }
 
         $testResults = Invoke-Pester @pesterParams
@@ -203,6 +222,13 @@ function Pester {
             throw "$($testResults.FailedCount) tests failed!"
         }
     }
+}
+
+function Hack {
+    [DependsOn(('Build', 'Import'))]
+    [CmdletBinding()]
+    param()
+    process {}
 }
 
 function Test {
