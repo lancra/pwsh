@@ -1,3 +1,23 @@
+<#
+.SYNOPSIS
+Retrieves the target framework version(s) for one or more MS Build files.
+
+.DESCRIPTION
+Uses ripgrep to identity the TargetFramework or TargetFrameworks property for
+all MS Build files in a directory. It then extracts the value and compares to a
+static list of current versions, so that outdated versions are clearly
+identified in the output.
+
+.PARAMETER Path
+The directory to search in. The current directory is used if no value is
+provided.
+
+.EXAMPLE
+Get-DotnetTargetFramework C:\Projects
+
+.EXAMPLE
+Get-DotnetTargetFramework
+#>
 function Get-DotnetTargetFramework {
     [CmdletBinding()]
     param(
