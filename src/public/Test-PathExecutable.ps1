@@ -9,6 +9,18 @@ anywhere.
 
 .PARAMETER Executable
 The executable name, with or without the extension.
+
+.EXAMPLE
+Test-PathExecutable -Executable 'git'
+$true
+
+.EXAMPLE
+Test-PathExecutable -Executable 'git.exe'
+$true
+
+.EXAMPLE
+Test-PathExecutable -Executable 'fake-executable'
+$false
 #>
 function Test-PathExecutable {
     [CmdletBinding()]
