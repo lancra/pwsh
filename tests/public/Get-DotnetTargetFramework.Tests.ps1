@@ -19,7 +19,7 @@ BeforeAll {
 Describe 'Error Checking' {
     It 'Fails when ripgrep is unavailable' {
         Mock Test-PathExecutable { $false } -ParameterFilter { $Executable -eq 'rg' } -Module Lance
-        { Get-DotnetVersion } | Should -Throw
+        { Get-DotnetTargetFramework } | Should -Throw
     }
 }
 
@@ -41,7 +41,7 @@ Describe 'Output' {
             Mock Write-Host { $writeHostInvocations.Add($Object) } -ModuleName Lance
 
             Set-Location $script:basePath
-            Get-DotnetVersion -Path '.'
+            Get-DotnetTargetFramework -Path '.'
         }
 
         It 'Converts relative path to absolute' {
@@ -64,7 +64,7 @@ Describe 'Output' {
             $writeHostInvocations = [System.Collections.Generic.List[string]]::new()
             Mock Write-Host { $writeHostInvocations.Add($Object) } -ModuleName Lance
 
-            Get-DotnetVersion -Path $script:basePath
+            Get-DotnetTargetFramework -Path $script:basePath
         }
 
         It 'Finds project file' {
@@ -98,7 +98,7 @@ Describe 'Output' {
 
             Mock Write-Host -ModuleName Lance
 
-            Get-DotnetVersion -Path $script:basePath
+            Get-DotnetTargetFramework -Path $script:basePath
         }
 
         It 'Writes unknown versions using red font' {
