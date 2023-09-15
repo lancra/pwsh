@@ -7,7 +7,10 @@ param(
     [string]$Task = 'Test',
 
     # Bootstrap dependencies
-    [switch]$Bootstrap
+    [switch]$Bootstrap,
+
+    # Executed for continuous integration
+    [switch]$CI
 )
 
 $sut = Join-Path -Path $PSScriptRoot -ChildPath 'src'
@@ -201,10 +204,17 @@ function Pester {
     process {
         Import-Module -Name $artifactsManifest -Force
 
+        $excludedTags = @()
+
+        if ($CI) {
+            $excludedTags = @('Windows')
+        }
+
         $pesterParams = @{
             Path = './tests'
             Output = 'Detailed'
             PassThru = $true
+            ExcludeTagFilter = $excludedTags
         }
 
         $testResults = Invoke-Pester @pesterParams

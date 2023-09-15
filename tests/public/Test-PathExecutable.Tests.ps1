@@ -1,5 +1,5 @@
 Describe 'Result' {
-    It 'Returns true when the executable is in the path' {
+    It 'Returns true when the executable is in the path' -Tag 'Windows' {
         Test-PathExecutable -Executable 'git.exe' | Should -Be $true
     }
 
