@@ -10,6 +10,7 @@
         'superclean'
     )
     FunctionsToExport = @(
+        'Get-DotnetOutdatedPackage',
         'Get-DotnetTargetFramework',
         'Invoke-SubDirectoryGitCommand',
         'Remove-BuildArtifact',
