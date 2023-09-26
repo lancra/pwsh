@@ -1,3 +1,27 @@
+<#
+.SYNOPSIS
+Retrieves the outdated NuGet packages for a .NET solution or project.
+
+.DESCRIPTION
+Uses the .NET CLI to determine the outdated NuGet packages for one or more
+projects. Then it re-arranges the output to a more compact package-scoped format
+(instead of the default project-scoped format), where each affected project is
+identified by a unique letter.
+
+.PARAMETER Path
+The directory, solution, or project to get outdated packages for. The current
+directory is used if no value is provided.
+
+.EXAMPLE
+Get-DotnetOutdatedPackage C:\Projects
+
+Gets outdated NuGet packages for a directory.
+
+.EXAMPLE
+Get-DotnetOutdatedPackage
+
+Gets outdated NuGet packages for the current directory.
+#>
 function Get-DotnetOutdatedPackage {
     [CmdletBinding()]
     param(
