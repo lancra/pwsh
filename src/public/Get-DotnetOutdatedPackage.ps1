@@ -42,7 +42,8 @@ function Get-DotnetOutdatedPackage {
         $projects = [System.Collections.Generic.Dictionary[string, LetterId]]::new()
         $projectPaths.GetEnumerator() |
             Where-Object Value -eq $true |
-            Sort-Object -Property Key |
+            # Force a natural number sort by separating digits and path separators with spaces.
+            Sort-Object -Property { [regex]::Replace($_.Key, '\d+|\\|/', { $args[0].Value.PadLeft(5) }) } |
             ForEach-Object {
                 $path = $_.Key
                 $projects.Add($path, $letterIdProvider.Next($path))
@@ -59,7 +60,7 @@ function Get-DotnetOutdatedPackage {
                     # Force a natural number sort by separating digits with spaces.
                     # Include a trailing period to force release versions to be sorted after pre-release versions.
                     # For example, "0.1.0" -> "0.1.0." is correctly sorted after "0.1.0-preview0" -> "0.1.0-preview0.".
-                    Sort-Object -Property { [regex]::Replace($_.Version, '\d+', { $args[0].Value.PadLeft(5) }) + '.' } |
+                    Sort-Object -Property { [regex]::Replace($_.Key, '\d+', { $args[0].Value.PadLeft(5) }) + '.' } |
                     ForEach-Object {
                         $packageReference = $_.Value
 
@@ -70,10 +71,11 @@ function Get-DotnetOutdatedPackage {
 
                         $segments.Add([OutputSegment]::new(' ('))
                         $packageReference.Projects |
-                            Sort-Object |
+                            Select-Object -Property @{name='LetterId';expression={$projects[$_]}} |
+                            Select-Object -ExpandProperty LetterId |
+                            Sort-Object -Property Letter |
                             ForEach-Object {
-                                $letterId = $projects[$_]
-                                $segments.Add([OutputSegment]::new($letterId.Letter, $letterId.Color))
+                                $segments.Add([OutputSegment]::new($_.Letter, $_.Color))
                             }
 
                         $segments.Add([OutputSegment]::new(')'))
