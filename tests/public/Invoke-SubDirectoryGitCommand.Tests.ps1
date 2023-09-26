@@ -23,19 +23,19 @@ Describe 'Command Execution' {
         }
 
         It 'Writes repository detail' {
-            Should -Invoke Write-GitRepositoryDetail -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-GitRepositoryDetail -ModuleName Lance -ParameterFilter {
                 $Path -eq $fooPath -and
                 -not $NoHead -and
                 $NoAheadBehind
             }
 
-            Should -Invoke Write-GitRepositoryDetail -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-GitRepositoryDetail -ModuleName Lance -ParameterFilter {
                 $Path -eq $barPath -and
                 -not $NoHead -and
                 $NoAheadBehind
             }
 
-            Should -Invoke Write-GitRepositoryDetail -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-GitRepositoryDetail -ModuleName Lance -ParameterFilter {
                 $Path -eq $bazPath -and
                 -not $NoHead -and
                 $NoAheadBehind
@@ -43,9 +43,9 @@ Describe 'Command Execution' {
         }
 
         It 'Invokes Git command' {
-            Should -Invoke 'git' -ModuleName 'Lance' -ParameterFilter { "$args" -eq "-C $fooPath fetch" }
-            Should -Invoke 'git' -ModuleName 'Lance' -ParameterFilter { "$args" -eq "-C $barPath fetch" }
-            Should -Invoke 'git' -ModuleName 'Lance' -ParameterFilter { "$args" -eq "-C $bazPath fetch" }
+            Should -Invoke 'git' -ModuleName Lance -ParameterFilter { "$args" -eq "-C $fooPath fetch" }
+            Should -Invoke 'git' -ModuleName Lance -ParameterFilter { "$args" -eq "-C $barPath fetch" }
+            Should -Invoke 'git' -ModuleName Lance -ParameterFilter { "$args" -eq "-C $bazPath fetch" }
         }
     }
 
@@ -62,17 +62,17 @@ Describe 'Command Execution' {
 
         It 'Trims provided command' {
             Invoke-SubDirectoryGitCommand -Command {  pull  } -Path $basePath
-            Should -Invoke 'git' -ModuleName 'Lance' -ParameterFilter { "$args" -eq "-C $childPath pull" }
+            Should -Invoke 'git' -ModuleName Lance -ParameterFilter { "$args" -eq "-C $childPath pull" }
         }
 
         It 'Skips current branch alias when head is shown' {
             Invoke-SubDirectoryGitCommand -Command { branch-current } -Path $basePath
-            Should -Not -Invoke 'git' -ModuleName 'Lance' -ParameterFilter { "$args" -eq "-C $childPath branch-current" }
+            Should -Not -Invoke 'git' -ModuleName Lance -ParameterFilter { "$args" -eq "-C $childPath branch-current" }
         }
 
         It 'Executes current branch alias when head is not shown' {
             Invoke-SubDirectoryGitCommand -Command { branch-current } -Path $basePath -NoHead
-            Should -Invoke 'git' -ModuleName 'Lance' -ParameterFilter { "$args" -eq "-C $childPath branch-current" }
+            Should -Invoke 'git' -ModuleName Lance -ParameterFilter { "$args" -eq "-C $childPath branch-current" }
         }
     }
 

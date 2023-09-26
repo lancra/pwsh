@@ -41,109 +41,109 @@ Describe 'Expected Output' {
             Write-GitRepositoryDetail -Path $localPath
 
             $expectedRepository = Split-Path -Path $localPath -Leaf
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq $expectedRepository -and
                 $ForegroundColor -eq 'Yellow'
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq ' (' -and $NoNewline -eq $true }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq ' (' -and $NoNewline -eq $true }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq 'main' -and
                 $ForegroundColor -eq 'Blue' -and
                 $NoNewline -eq $true
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq ' +0' -and
                 $ForegroundColor -eq 'Green' -and
                 $NoNewline -eq $true
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq ' -0' -and
                 $ForegroundColor -eq 'Red' -and
                 $NoNewline -eq $true
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq ')' -and $NoNewline -eq $true }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq ')' -and $NoNewline -eq $true }
         }
 
         It 'Excludes head when specified' {
             Write-GitRepositoryDetail -Path $localPath -NoHead
 
             $expectedRepository = Split-Path -Path $localPath -Leaf
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq $expectedRepository -and
                 $ForegroundColor -eq 'Yellow'
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq ' (' -and $NoNewline -eq $true }
-            Should -Not -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq ' (' -and $NoNewline -eq $true }
+            Should -Not -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq 'main' -and
                 $ForegroundColor -eq 'Blue' -and
                 $NoNewline -eq $true
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq '+0' -and
                 $ForegroundColor -eq 'Green' -and
                 $NoNewline -eq $true
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq ' -0' -and
                 $ForegroundColor -eq 'Red' -and
                 $NoNewline -eq $true
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq ')' -and $NoNewline -eq $true }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq ')' -and $NoNewline -eq $true }
         }
 
         It 'Excludes ahead/behind when specified' {
             Write-GitRepositoryDetail -Path $localPath -NoAheadBehind
 
             $expectedRepository = Split-Path -Path $localPath -Leaf
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq $expectedRepository -and
                 $ForegroundColor -eq 'Yellow'
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq ' (' -and $NoNewline -eq $true }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq ' (' -and $NoNewline -eq $true }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq 'main' -and
                 $ForegroundColor -eq 'Blue' -and
                 $NoNewline -eq $true
             }
-            Should -Not -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Not -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq ' +0' -and
                 $ForegroundColor -eq 'Green' -and
                 $NoNewline -eq $true
             }
-            Should -Not -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Not -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq ' -0' -and
                 $ForegroundColor -eq 'Red' -and
                 $NoNewline -eq $true
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq ')' -and $NoNewline -eq $true }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq ')' -and $NoNewline -eq $true }
         }
 
         It 'Excludes head and ahead/behind when specified' {
             Write-GitRepositoryDetail -Path $localPath -NoHead -NoAheadBehind
 
             $expectedRepository = Split-Path -Path $localPath -Leaf
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq $expectedRepository -and
                 $ForegroundColor -eq 'Yellow'
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq ':' -and $NoNewline -eq $true }
-            Should -Not -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq ' (' -and $NoNewline -eq $true }
-            Should -Not -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq ':' -and $NoNewline -eq $true }
+            Should -Not -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq ' (' -and $NoNewline -eq $true }
+            Should -Not -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq 'main' -and
                 $ForegroundColor -eq 'Blue' -and
                 $NoNewline -eq $true
             }
-            Should -Not -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Not -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq ' +0' -and
                 $ForegroundColor -eq 'Green' -and
                 $NoNewline -eq $true
             }
-            Should -Not -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Not -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq ' -0' -and
                 $ForegroundColor -eq 'Red' -and
                 $NoNewline -eq $true
             }
-            Should -Not -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq ')' -and $NoNewline -eq $true }
+            Should -Not -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq ')' -and $NoNewline -eq $true }
         }
     }
 
@@ -155,27 +155,27 @@ Describe 'Expected Output' {
             Write-GitRepositoryDetail -Path $localPath
 
             $expectedRepository = Split-Path -Path $localPath -Leaf
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq $expectedRepository -and
                 $ForegroundColor -eq 'Yellow'
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq ' (' -and $NoNewline -eq $true }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq ' (' -and $NoNewline -eq $true }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq 'fancy-new-branch' -and
                 $ForegroundColor -eq 'Blue' -and
                 $NoNewline -eq $true
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq ' +0' -and
                 $ForegroundColor -eq 'Green' -and
                 $NoNewline -eq $true
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq ' -0' -and
                 $ForegroundColor -eq 'Red' -and
                 $NoNewline -eq $true
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq ')' -and $NoNewline -eq $true }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq ')' -and $NoNewline -eq $true }
         }
 
         It 'Shows detached head correctly' {
@@ -185,27 +185,27 @@ Describe 'Expected Output' {
             Write-GitRepositoryDetail -Path $localPath
 
             $expectedRepository = Split-Path -Path $localPath -Leaf
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq $expectedRepository -and
                 $ForegroundColor -eq 'Yellow'
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq ' (' -and $NoNewline -eq $true }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq ' (' -and $NoNewline -eq $true }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq '(detached)' -and
                 $ForegroundColor -eq 'Blue' -and
                 $NoNewline -eq $true
             }
-            Should -Not -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Not -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq ' +0' -and
                 $ForegroundColor -eq 'Green' -and
                 $NoNewline -eq $true
             }
-            Should -Not -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Not -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq ' -0' -and
                 $ForegroundColor -eq 'Red' -and
                 $NoNewline -eq $true
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq ')' -and $NoNewline -eq $true }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq ')' -and $NoNewline -eq $true }
         }
 
         It 'Excludes ahead/behind for local branch' {
@@ -214,27 +214,27 @@ Describe 'Expected Output' {
             Write-GitRepositoryDetail -Path $localPath
 
             $expectedRepository = Split-Path -Path $localPath -Leaf
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq $expectedRepository -and
                 $ForegroundColor -eq 'Yellow'
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq ' (' -and $NoNewline -eq $true }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq ' (' -and $NoNewline -eq $true }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq 'fancy-new-branch' -and
                 $ForegroundColor -eq 'Blue' -and
                 $NoNewline -eq $true
             }
-            Should -Not -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Not -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq ' +0' -and
                 $ForegroundColor -eq 'Green' -and
                 $NoNewline -eq $true
             }
-            Should -Not -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Not -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq ' -0' -and
                 $ForegroundColor -eq 'Red' -and
                 $NoNewline -eq $true
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq ')' -and $NoNewline -eq $true }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq ')' -and $NoNewline -eq $true }
         }
 
         It 'Shows correct ahead' {
@@ -249,27 +249,27 @@ Describe 'Expected Output' {
             Write-GitRepositoryDetail -Path $localPath
 
             $expectedRepository = Split-Path -Path $localPath -Leaf
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq $expectedRepository -and
                 $ForegroundColor -eq 'Yellow'
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq ' (' -and $NoNewline -eq $true }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq ' (' -and $NoNewline -eq $true }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq 'main' -and
                 $ForegroundColor -eq 'Blue' -and
                 $NoNewline -eq $true
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq ' +2' -and
                 $ForegroundColor -eq 'Green' -and
                 $NoNewline -eq $true
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq ' -0' -and
                 $ForegroundColor -eq 'Red' -and
                 $NoNewline -eq $true
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq ')' -and $NoNewline -eq $true }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq ')' -and $NoNewline -eq $true }
         }
     }
 
@@ -284,27 +284,27 @@ Describe 'Expected Output' {
             Write-GitRepositoryDetail -Path $localPath
 
             $expectedRepository = Split-Path -Path $localPath -Leaf
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq $expectedRepository -and
                 $ForegroundColor -eq 'Yellow'
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq ' (' -and $NoNewline -eq $true }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq ' (' -and $NoNewline -eq $true }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq 'main' -and
                 $ForegroundColor -eq 'Blue' -and
                 $NoNewline -eq $true
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq ' +0' -and
                 $ForegroundColor -eq 'Green' -and
                 $NoNewline -eq $true
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq ' -1' -and
                 $ForegroundColor -eq 'Red' -and
                 $NoNewline -eq $true
             }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq ')' -and $NoNewline -eq $true }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq ')' -and $NoNewline -eq $true }
         }
     }
 

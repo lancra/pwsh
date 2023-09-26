@@ -25,7 +25,7 @@ Describe 'Deletion' {
             New-Item -ItemType 'File' -Path $remainingFooFilePath -Force
             New-Item -ItemType 'File' -Path $remainingBarFilePath -Force
 
-            Mock Write-Host -ModuleName 'Lance'
+            Mock Write-Host -ModuleName Lance
 
             Remove-BuildArtifact -Path $rootPath
         }
@@ -40,9 +40,9 @@ Describe 'Deletion' {
         }
 
         It 'Writes deleted paths to the host' {
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq "Removing $rootArtifactsPath" }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq "Removing $fooArtifactsPath" }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq "Removing $barArtifactsPath" }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq "Removing $rootArtifactsPath" }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq "Removing $fooArtifactsPath" }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq "Removing $barArtifactsPath" }
         }
 
         It 'Does not delete other files' {
@@ -78,7 +78,7 @@ Describe 'Deletion' {
             New-Item -ItemType 'File' -Path $remainingFooFilePath -Force
             New-Item -ItemType 'File' -Path $remainingBarFilePath -Force
 
-            Mock Write-Host -ModuleName 'Lance'
+            Mock Write-Host -ModuleName Lance
 
             Remove-BuildArtifact -Path $rootPath
         }
@@ -93,9 +93,9 @@ Describe 'Deletion' {
         }
 
         It 'Writes deleted paths to the host' {
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq "Removing $rootBinPath" }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq "Removing $fooBinPath" }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq "Removing $barBinPath" }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq "Removing $rootBinPath" }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq "Removing $fooBinPath" }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq "Removing $barBinPath" }
         }
 
         It 'Does not delete other files' {
@@ -131,7 +131,7 @@ Describe 'Deletion' {
             New-Item -ItemType 'File' -Path $remainingFooFilePath -Force
             New-Item -ItemType 'File' -Path $remainingBarFilePath -Force
 
-            Mock Write-Host -ModuleName 'Lance'
+            Mock Write-Host -ModuleName Lance
 
             Remove-BuildArtifact -Path $rootPath
         }
@@ -146,9 +146,9 @@ Describe 'Deletion' {
         }
 
         It 'Writes deleted paths to the host' {
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq "Removing $rootObjPath" }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq "Removing $fooObjPath" }
-            Should -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq "Removing $barObjPath" }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq "Removing $rootObjPath" }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq "Removing $fooObjPath" }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq "Removing $barObjPath" }
         }
 
         It 'Does not delete other files' {
@@ -173,7 +173,7 @@ Describe 'Deletion' {
             New-Item -ItemType 'Directory' -Path $binPath -Force
             New-Item -ItemType 'Directory' -Path $objPath -Force
 
-            Mock Write-Host -ModuleName 'Lance'
+            Mock Write-Host -ModuleName Lance
 
             Remove-BuildArtifact -Path $rootPath -WhatIf
         }
@@ -185,9 +185,9 @@ Describe 'Deletion' {
         }
 
         It 'Does not write deleted paths to the host' {
-            Should -Not -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq "Removing $artifactsPath" }
-            Should -Not -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq "Removing $binPath" }
-            Should -Not -Invoke Write-Host -ModuleName 'Lance' -ParameterFilter { $Object -eq "Removing $objPath" }
+            Should -Not -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq "Removing $artifactsPath" }
+            Should -Not -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq "Removing $binPath" }
+            Should -Not -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq "Removing $objPath" }
         }
 
         AfterEach {
