@@ -18,7 +18,7 @@ BeforeAll {
 
 Describe 'Error Checking' {
     It 'Fails when ripgrep is unavailable' {
-        Mock Test-PathExecutable { $false } -ParameterFilter { $Executable -eq 'rg' } -Module Lance
+        Mock Test-PathExecutable { $false } -ParameterFilter { $Executable -eq 'rg' } -ModuleName Lance
         { Get-DotnetTargetFramework } | Should -Throw
     }
 }
@@ -26,8 +26,6 @@ Describe 'Error Checking' {
 Describe 'Output' {
     BeforeEach {
         $script:basePath = New-TemporaryDirectory
-
-        Mock Write-Host -Module Lance
     }
 
     Context 'Relative Path' {
@@ -102,32 +100,32 @@ Describe 'Output' {
         }
 
         It 'Writes unknown versions using red font' {
-            Should -Invoke -Command Write-Host -ModuleName Lance -ParameterFilter { $ForegroundColor -eq 'Red' -and $Object -eq 'foo' }
-            Should -Invoke -Command Write-Host -ModuleName Lance -ParameterFilter { $ForegroundColor -eq 'Red' -and $Object -eq 'bar' }
-            Should -Invoke -Command Write-Host -ModuleName Lance -ParameterFilter { $ForegroundColor -eq 'Red' -and $Object -eq 'baz' }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $ForegroundColor -eq 'Red' -and $Object -eq 'foo' }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $ForegroundColor -eq 'Red' -and $Object -eq 'bar' }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $ForegroundColor -eq 'Red' -and $Object -eq 'baz' }
         }
 
         It 'Writes outdated versions using red font' {
-            Should -Invoke -Command Write-Host -ModuleName Lance -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $ForegroundColor -eq 'Red' -and
                 $Object -eq 'netcoreapp3.1'
             }
 
-            Should -Invoke -Command Write-Host -ModuleName Lance -ParameterFilter { $ForegroundColor -eq 'Red' -and $Object -eq 'net5.0' }
-            Should -Invoke -Command Write-Host -ModuleName Lance -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $ForegroundColor -eq 'Red' -and $Object -eq 'net5.0' }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $ForegroundColor -eq 'Red' -and
                 $Object -eq 'net5.0-windows'
             }
         }
 
         It 'Writes current versions using green font' {
-            Should -Invoke -Command Write-Host -ModuleName Lance -ParameterFilter { $ForegroundColor -eq 'Green' -and $Object -eq 'net6.0' }
-            Should -Invoke -Command Write-Host -ModuleName Lance -ParameterFilter {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $ForegroundColor -eq 'Green' -and $Object -eq 'net6.0' }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $ForegroundColor -eq 'Green' -and
                 $Object -eq 'net6.0-android'
             }
 
-            Should -Invoke -Command Write-Host -ModuleName Lance -ParameterFilter { $ForegroundColor -eq 'Green' -and $Object -eq 'net7.0' }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $ForegroundColor -eq 'Green' -and $Object -eq 'net7.0' }
         }
     }
 
