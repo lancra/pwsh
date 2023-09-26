@@ -10,6 +10,11 @@ associated exception(s).
 The error record to output. The default value is the latest error from the
 associated global variable.
 
+.EXAMPLE
+Resolve-Error
+
+Displays details for the last error.
+
 .LINK
 https://devblogs.microsoft.com/powershell/resolve-error/
 #>

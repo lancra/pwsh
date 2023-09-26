@@ -24,9 +24,14 @@ Write-GitRepositoryDetail function.
 .EXAMPLE
 Invoke-SubDirectoryGitCommand -Command {fetch} -Path C:\Projects\git
 
+Executes a fetch for a directory.
+
 .EXAMPLE
 Invoke-SubDirectoryGitCommand -Command {config --get commit.gpgSign} `
     -Path C:\Projects\git -NoHead -NoAheadBehind
+
+Gets the value that determines whether commit are gpg-signed for a directory,
+hiding the head and ahead/behind values for each repository.
 #>
 function Invoke-SubDirectoryGitCommand {
     [CmdletBinding()]

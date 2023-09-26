@@ -10,6 +10,7 @@
         'superclean'
     )
     FunctionsToExport = @(
+        'Get-DotnetOutdatedPackage',
         'Get-DotnetTargetFramework',
         'Invoke-SubDirectoryGitCommand',
         'Remove-BuildArtifact',
@@ -21,7 +22,7 @@
     VariablesToExport = 'Lance'
     PrivateData = @{
         PSData = @{
-            Prerelease = 'preview4'
+            Prerelease = 'preview5'
             ReleaseNotes = 'https://raw.githubusercontent.com/lancra/pwsh/main/CHANGELOG.md'
             LicenseUri = 'https://raw.githubusercontent.com/lancra/pwsh/main/LICENSE'
             ProjectUri = 'https://github.com/lancra/pwsh'

@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "parameters": "--outdated",
+  "sources": ["https://api.nuget.org/v3/index.json", "/usr/nuget"],
+  "projects": [
+    {
+      "path": "/usr/git/a/a1/project.csproj",
+      "frameworks": [
+        {
+          "framework": "net6.0",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "0.1.1",
+              "resolvedVersion": "0.1.1",
+              "latestVersion": "1.0.0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/usr/git/a/a10/project.csproj",
+      "frameworks": [
+        {
+          "framework": "net6.0",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "0.1.1",
+              "resolvedVersion": "0.1.1",
+              "latestVersion": "1.0.0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/usr/git/b/project.csproj",
+      "frameworks": [
+        {
+          "framework": "net6.0",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "0.1.1",
+              "resolvedVersion": "0.1.1",
+              "latestVersion": "1.0.0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/usr/git/a1/a2/project.csproj",
+      "frameworks": [
+        {
+          "framework": "net6.0",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "0.1.1",
+              "resolvedVersion": "0.1.1",
+              "latestVersion": "1.0.0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/usr/git/a10/project.csproj",
+      "frameworks": [
+        {
+          "framework": "net6.0",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "0.1.1",
+              "resolvedVersion": "0.1.1",
+              "latestVersion": "1.0.0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/usr/git/a11/project.csproj",
+      "frameworks": [
+        {
+          "framework": "net6.0",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "0.1.1",
+              "resolvedVersion": "0.1.1",
+              "latestVersion": "1.0.0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/usr/git/a2/a/project.csproj",
+      "frameworks": [
+        {
+          "framework": "net6.0",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "0.1.1",
+              "resolvedVersion": "0.1.1",
+              "latestVersion": "1.0.0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/usr/git/b100/project.csproj",
+      "frameworks": [
+        {
+          "framework": "net6.0",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "0.1.1",
+              "resolvedVersion": "0.1.1",
+              "latestVersion": "1.0.0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/usr/git/b12/project.csproj",
+      "frameworks": [
+        {
+          "framework": "net6.0",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "0.1.1",
+              "resolvedVersion": "0.1.1",
+              "latestVersion": "1.0.0"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

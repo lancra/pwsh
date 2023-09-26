@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "parameters": "--outdated",
+  "sources": ["https://api.nuget.org/v3/index.json", "/usr/nuget"],
+  "projects": [
+    {
+      "path": "/usr/git/foo.csproj"
+    },
+    {
+      "path": "/usr/git/bar.csproj"
+    }
+  ]
+}

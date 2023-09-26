@@ -1,0 +1,188 @@
+{
+  "version": 1,
+  "parameters": "--outdated",
+  "sources": ["https://api.nuget.org/v3/index.json", "/usr/nuget"],
+  "projects": [
+    {
+      "path": "/usr/git/foo.csproj",
+      "frameworks": [
+        {
+          "framework": "A",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "0.1.10",
+              "resolvedVersion": "0.1.10",
+              "latestVersion": "2.0.0"
+            }
+          ]
+        },
+        {
+          "framework": "B",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "0.1.0",
+              "resolvedVersion": "0.1.0",
+              "latestVersion": "2.0.0"
+            }
+          ]
+        },
+        {
+          "framework": "C",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "0.1.0-preview0",
+              "resolvedVersion": "0.1.0-preview0",
+              "latestVersion": "2.0.0"
+            }
+          ]
+        },
+        {
+          "framework": "D",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "1.0.1",
+              "resolvedVersion": "1.0.1",
+              "latestVersion": "2.0.0"
+            }
+          ]
+        },
+        {
+          "framework": "E",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "0.1.0-preview10",
+              "resolvedVersion": "0.1.0-preview10",
+              "latestVersion": "2.0.0"
+            }
+          ]
+        },
+        {
+          "framework": "F",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "0.10.1",
+              "resolvedVersion": "0.10.1",
+              "latestVersion": "2.0.0"
+            }
+          ]
+        },
+        {
+          "framework": "G",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "1.1.10",
+              "resolvedVersion": "1.1.10",
+              "latestVersion": "2.0.0"
+            }
+          ]
+        },
+        {
+          "framework": "H",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "0.1.0-preview1",
+              "resolvedVersion": "0.1.0-preview1",
+              "latestVersion": "2.0.0"
+            }
+          ]
+        },
+        {
+          "framework": "I",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "0.1.1",
+              "resolvedVersion": "0.1.1",
+              "latestVersion": "2.0.0"
+            }
+          ]
+        },
+        {
+          "framework": "J",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "1.1.11",
+              "resolvedVersion": "1.1.11",
+              "latestVersion": "2.0.0"
+            }
+          ]
+        },
+        {
+          "framework": "K",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "1.0.0-preview0",
+              "resolvedVersion": "1.0.0-preview0",
+              "latestVersion": "2.0.0"
+            }
+          ]
+        },
+        {
+          "framework": "L",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "1.1.0",
+              "resolvedVersion": "1.1.0",
+              "latestVersion": "2.0.0"
+            }
+          ]
+        },
+        {
+          "framework": "M",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "1.0.0-preview1",
+              "resolvedVersion": "1.0.0-preview1",
+              "latestVersion": "2.0.0"
+            }
+          ]
+        },
+        {
+          "framework": "N",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "1.1.1",
+              "resolvedVersion": "1.1.1",
+              "latestVersion": "2.0.0"
+            }
+          ]
+        },
+        {
+          "framework": "O",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "1.0.10",
+              "resolvedVersion": "1.0.10",
+              "latestVersion": "2.0.0"
+            }
+          ]
+        },
+        {
+          "framework": "P",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "0.10.10",
+              "resolvedVersion": "0.10.10",
+              "latestVersion": "2.0.0"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

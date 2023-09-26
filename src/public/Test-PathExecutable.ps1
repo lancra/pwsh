@@ -14,13 +14,20 @@ The executable name, with or without the extension.
 Test-PathExecutable -Executable 'git'
 $true
 
+Determines that git is on the path.
+
 .EXAMPLE
 Test-PathExecutable -Executable 'git.exe'
 $true
 
+Determines that the git executable is on the path. This is a Windows-specific
+execution.
+
 .EXAMPLE
 Test-PathExecutable -Executable 'fake-executable'
 $false
+
+Determines that fake-executable is not on the path.
 #>
 function Test-PathExecutable {
     [CmdletBinding()]

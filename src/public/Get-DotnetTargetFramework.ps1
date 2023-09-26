@@ -15,8 +15,12 @@ provided.
 .EXAMPLE
 Get-DotnetTargetFramework C:\Projects
 
+Gets .NET target framework for a directory.
+
 .EXAMPLE
 Get-DotnetTargetFramework
+
+Gets .NET target framework for the current directory.
 #>
 function Get-DotnetTargetFramework {
     [CmdletBinding()]

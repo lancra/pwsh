@@ -6,6 +6,11 @@ Force stops Windows Subsystem for Linux.
 Stops all processes associated with WSL, initiates a shutdown via WSL, then
 stops the WSL service process again.
 
+.EXAMPLE
+Stop-Wsl
+
+Stops the WSL processes.
+
 .LINK
 https://github.com/microsoft/WSL/issues/8529#issuecomment-1623852490
 #>

@@ -21,17 +21,25 @@ Disables writing the remote ahead/behind to the host.
 Write-GitRepositoryDetail -Path C:\Projects\git
 git (seen +0 -0)
 
+Writes the repository detail for a path.
+
 .EXAMPLE
 Write-GitRepositoryDetail -Path C:\Projects\git -NoHead
 git (+0 -0)
+
+Writes the repository detail for a path, excluding the head.
 
 .EXAMPLE
 Write-GitRepositoryDetail -Path C:\Projects\git -NoAheadBehind
 git (seen)
 
+Writes the repository detail for a path, excluding the ahead/behind.
+
 .EXAMPLE
 Write-GitRepositoryDetail -Path C:\Projects\git -NoHead -NoAheadBehind
 git:
+
+Writes the repository detail for a path, excluding the head and ahead/behind.
 #>
 function Write-GitRepositoryDetail {
     [CmdletBinding()]
