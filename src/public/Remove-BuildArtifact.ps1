@@ -25,10 +25,20 @@ function Remove-BuildArtifact {
         [string]$Path = '.'
     )
     begin {
-        $targetFolderNames = @('artifacts', 'bin', 'obj')
+        $nodeDirectory = 'node_modules'
+        $foldersInSearch = @('artifacts', 'bin', 'obj')
+        $foldersNotInParent = $foldersInSearch + $nodeDirectory
     }
     process {
-        Get-ChildItem -Path $Path -Include $targetFolderNames -Recurse |
+        Get-ChildItem -Path $Path -Directory -Include $foldersInSearch -Recurse |
+            Where-Object -FilterScript {
+                $parentPath = $_.Parent.FullName
+                $parentMatches = $foldersNotInParent |
+                    Where-Object -FilterScript { $parentPath -match $_ }
+
+                # A match in the parent path indicates that this directory will either be deleted or ignored as part of the parent.
+                $parentMatches.Count -eq 0
+            } |
             ForEach-Object {
                 $path = $_.FullName
                 if (-not $WhatIfPreference) {

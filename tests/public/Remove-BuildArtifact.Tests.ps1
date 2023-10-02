@@ -2,6 +2,59 @@ BeforeAll {
     . $PSScriptRoot/../testing/New-TemporaryDirectory.ps1
 }
 
+Describe 'Leaf Directory Exclusion' {
+    BeforeEach {
+        $rootPath = New-TemporaryDirectory
+        $rootArtifactsPath = Join-Path -Path $rootPath -ChildPath 'artifacts'
+        $rootBinPath = Join-Path -Path $rootPath -ChildPath 'bin'
+        $rootNodePath = Join-Path -Path $rootPath -ChildPath 'node_modules'
+        $rootObjPath = Join-Path -Path $rootPath -ChildPath 'obj'
+
+        $nonLeafDirectories = @($rootArtifactsPath, $rootBinPath, $rootNodePath, $rootObjPath)
+        foreach ($directory in $nonLeafDirectories) {
+            New-Item -ItemType 'Directory' -Path (Join-Path -Path $directory -ChildPath 'artifacts') -Force
+            New-Item -ItemType 'Directory' -Path (Join-Path -Path $directory -ChildPath 'bin') -Force
+            New-Item -ItemType 'Directory' -Path (Join-Path -Path $directory -ChildPath 'node_modules') -Force
+            New-Item -ItemType 'Directory' -Path (Join-Path -Path $directory -ChildPath 'obj') -Force
+        }
+
+        Mock Write-Host -ModuleName Lance
+    }
+
+    It 'Deletes non-leaf directories only' {
+        Remove-BuildArtifact -Path $rootPath
+
+        Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq "Removing $rootArtifactsPath" }
+        Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq "Removing $rootBinPath" }
+        Should -Not -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq "Removing $rootNodePath" }
+        Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $Object -eq "Removing $rootObjPath" }
+    }
+
+    It 'Does not delete leaf directories' {
+        Remove-BuildArtifact -Path $rootPath
+
+        Should -Not -Invoke Write-Host -ModuleName Lance -ParameterFilter {
+            $Object -like "Removing $(Join-Path -Path $rootArtifactsPath -ChildPath '*')"
+        }
+
+        Should -Not -Invoke Write-Host -ModuleName Lance -ParameterFilter {
+            $Object -like "Removing $(Join-Path -Path $rootBinPath -ChildPath '*')"
+        }
+
+        Should -Not -Invoke Write-Host -ModuleName Lance -ParameterFilter {
+            $Object -like "Removing $(Join-Path -Path $rootNodePath -ChildPath '*')"
+        }
+
+        Should -Not -Invoke Write-Host -ModuleName Lance -ParameterFilter {
+            $Object -like "Removing $(Join-Path -Path $rootObjPath -ChildPath '*')"
+        }
+    }
+
+    AfterEach {
+        Remove-Item -Path $rootPath -Recurse -Force
+    }
+}
+
 Describe 'Deletion' {
     Context 'Artifacts' {
         BeforeEach {
