@@ -6,6 +6,7 @@ BeforeAll {
     git -C $remoteTemplatePath init --initial-branch=main
     git -C $remoteTemplatePath config --local user.email "testuser@example.org"
     git -C $remoteTemplatePath config --local user.name "Test User"
+    git -C $remoteTemplatePath config --local commit.gpgSign false
 
     'foo' > (Join-Path -Path $remoteTemplatePath -ChildPath 'foo.txt')
     git -C $remoteTemplatePath add 'foo.txt'
@@ -20,6 +21,7 @@ BeforeAll {
     git clone "$remoteTemplatePath/.git" $localTemplatePath *> $null
     git -C $localTemplatePath config --local user.email "testuser@example.org"
     git -C $localTemplatePath config --local user.name "Test User"
+    git -C $localTemplatePath config --local commit.gpgSign false
 }
 
 Describe 'Expected Output' {

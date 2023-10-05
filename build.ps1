@@ -129,7 +129,6 @@ function Init {
     [CmdletBinding()]
     param()
     process {
-        Remove-Module -Name Lance -Force -ErrorAction SilentlyContinue
         Set-BuildEnvironment -Force
     }
 }
@@ -193,6 +192,7 @@ function Import {
     [CmdletBinding()]
     param()
     process {
+        Remove-Module -Name Lance -Force -ErrorAction SilentlyContinue
         Import-Module -Name $artifactsManifest -Force
     }
 }
