@@ -14,26 +14,15 @@
    Register-PSRepository -Name 'Local' -SourceLocation '<PATH>' -ScriptSourceLocation '<PATH>' -InstallationPolicy 'Trusted'
    ```
 
-## Publish Module
+## Execute Install
 
-1. Execute the build script.
-
-   ```powershell
-   ./build.ps1
-   ```
-
-1. Publish the module to the local repository.
+1. Execute the install script.
 
    ```powershell
-   $modulePath = Join-Path -Path '<GIT_REPOSITORY_ROOT_PATH>' -ChildPath 'artifacts' -AdditionalChildPath 'Lance'
-   Publish-Module -Path $modulePath -Repository 'Local'
+   ./install.ps1
    ```
 
-1. Install the module from the repository.
-
-   ```powershell
-   Install-Module -Name 'Lance' -Repository 'Local'
-   ```
+## Import from Profile
 
 1. Import the module as part of your PowerShell profile.
 
