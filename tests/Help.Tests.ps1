@@ -18,6 +18,7 @@ BeforeDiscovery {
                 'OutBuffer',
                 'OutVariable',
                 'PipelineVariable',
+                'ProgressAction',
                 'Verbose',
                 'WarningAction',
                 'WarningVariable',
