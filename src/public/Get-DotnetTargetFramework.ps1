@@ -12,6 +12,9 @@ identified in the output.
 The directory to search in. The current directory is used if no value is
 provided.
 
+.PARAMETER ShowRelative
+Disables conversion of relative paths to absolute paths.
+
 .EXAMPLE
 Get-DotnetTargetFramework C:\Projects
 
@@ -26,15 +29,18 @@ function Get-DotnetTargetFramework {
     [CmdletBinding()]
     param(
         [Parameter()]
-        [string]$Path = '.'
+        [string]$Path = '.',
+        [switch]$ShowRelative
     )
     begin {
         if (-not (Test-PathExecutable -Executable 'rg')) {
             throw 'ripgrep must be installed and available on the path for this script.'
         }
 
-        # Use the absolute path so that the output is more clear for sharing.
-        $Path = (Resolve-Path -Path $Path).Path
+        # Use the absolute path by default so that the output is more clear for sharing.
+        if (-not $ShowRelative) {
+            $Path = (Resolve-Path -Path $Path).Path
+        }
 
         $ripgrepArgs = @(
             '--ignore-case',

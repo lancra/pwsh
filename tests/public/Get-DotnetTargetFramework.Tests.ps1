@@ -14,6 +14,9 @@ BeforeAll {
             Out-File -FilePath $Path -InputObject $Contents
         }
     }
+
+    $script:ripgrepConfigPath = $env:RIPGREP_CONFIG_PATH
+    $env:RIPGREP_CONFIG_PATH = (Resolve-Path -Path './tests/testing/rg_config').Path
 }
 
 Describe 'Error Checking' {
@@ -36,7 +39,8 @@ Describe 'Output' {
             $innerDirectoryPath = Join-Path -Path $script:basePath -ChildPath $innerDirectoryName
             New-Item -ItemType Directory -Path $innerDirectoryPath
 
-            $projectPath = Join-Path $innerDirectoryPath -ChildPath 'Project.csproj'
+            $projectName = 'Project.csproj'
+            $projectPath = Join-Path $innerDirectoryPath -ChildPath $projectName
             New-MSBuildFile -Path $projectPath -Contents '<TargetFramework>foo</TargetFramework>'
 
             $writeHostInvocations = [System.Collections.Generic.List[string]]::new()
@@ -69,6 +73,40 @@ Describe 'Output' {
             Get-DotnetTargetFramework -Path "../$innerDirectoryName"
 
             ($writeHostInvocations -join '') | Should -Be "foo: $projectPath"
+        }
+
+        It 'Does not convert current directory relative path to absolute when relative is requested' {
+            Set-Location $script:basePath
+            Get-DotnetTargetFramework -Path '.' -ShowRelative
+
+            $expectedPath = Join-Path -Path '.' -ChildPath $innerDirectoryName -AdditionalChildPath $projectName
+            ($writeHostInvocations -join '') | Should -Be "foo: $expectedPath"
+        }
+
+        It 'Does not convert current directory prefixed relative path to absolute when relative is requested' {
+            Set-Location $script:basePath
+            $path = Join-Path -Path '.' -ChildPath $innerDirectoryName
+            Get-DotnetTargetFramework -Path $path -ShowRelative
+
+            $expectedPath = Join-Path -Path '.' -ChildPath $innerDirectoryName -AdditionalChildPath $projectName
+            ($writeHostInvocations -join '') | Should -Be "foo: $expectedPath"
+        }
+
+        It 'Does not convert parent directory relative path to absolute when relative is requested' {
+            Set-Location $innerDirectoryPath
+            Get-DotnetTargetFramework -Path '..' -ShowRelative
+
+            $expectedPath = Join-Path -Path '..' -ChildPath $innerDirectoryName -AdditionalChildPath $projectName
+            ($writeHostInvocations -join '') | Should -Be "foo: $expectedPath"
+        }
+
+        It 'Does not convert parent directory prefixed relative path to absolute when relative is requested' {
+            Set-Location $innerDirectoryPath
+            $path = Join-Path -Path '..' -ChildPath $innerDirectoryName
+            Get-DotnetTargetFramework -Path $path -ShowRelative
+
+            $expectedPath = Join-Path -Path '..' -ChildPath $innerDirectoryName -AdditionalChildPath $projectName
+            ($writeHostInvocations -join '') | Should -Be "foo: $expectedPath"
         }
 
         AfterEach {
@@ -157,4 +195,8 @@ Describe 'Output' {
     AfterEach {
         Remove-Item -Path $script:basePath -Recurse -Force
     }
+}
+
+AfterAll {
+    $env:RIPGREP_CONFIG_PATH = $script:ripgrepConfigPath
 }
