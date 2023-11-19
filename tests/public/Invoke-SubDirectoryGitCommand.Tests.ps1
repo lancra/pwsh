@@ -65,14 +65,9 @@ Describe 'Command Execution' {
             Should -Invoke 'git' -ModuleName Lance -ParameterFilter { "$args" -eq "-C $childPath pull" }
         }
 
-        It 'Skips current branch alias when head is shown' {
-            Invoke-SubDirectoryGitCommand -Command { branch-current } -Path $basePath
-            Should -Not -Invoke 'git' -ModuleName Lance -ParameterFilter { "$args" -eq "-C $childPath branch-current" }
-        }
-
-        It 'Executes current branch alias when head is not shown' {
-            Invoke-SubDirectoryGitCommand -Command { branch-current } -Path $basePath -NoHead
-            Should -Invoke 'git' -ModuleName Lance -ParameterFilter { "$args" -eq "-C $childPath branch-current" }
+        It 'Skips execution for noop command' {
+            Invoke-SubDirectoryGitCommand -Command { noop } -Path $basePath
+            Should -Not -Invoke 'git' -ModuleName Lance -ParameterFilter { "$args" -eq "-C $childPath noop" }
         }
     }
 
