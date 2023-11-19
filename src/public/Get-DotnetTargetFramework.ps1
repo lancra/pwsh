@@ -57,7 +57,8 @@ function Get-DotnetTargetFramework {
             'netstandard2.0', # .NET Standard for .NET Core & .NET Framework
             'netstandard2.1', # .NET Standard for .NET Core Only
             'net6.0*', # LTS until 2024-11-12
-            'net7.0*' # STS until 2024-05-14
+            'net7.0*', # STS until 2024-05-14
+            'net8.0*' # LTS until 2026-11-10
         )
 
         $supportedVersionAggregatePattern = Join-String -InputObject $supportedVersionPatterns -Separator '|'
