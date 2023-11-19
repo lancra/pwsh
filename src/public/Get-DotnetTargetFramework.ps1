@@ -34,9 +34,7 @@ function Get-DotnetTargetFramework {
         }
 
         # Use the absolute path so that the output is more clear for sharing.
-        if ($Path -eq '.') {
-            $Path = Get-Location
-        }
+        $Path = (Resolve-Path -Path $Path).Path
 
         $ripgrepArgs = @(
             '--ignore-case',

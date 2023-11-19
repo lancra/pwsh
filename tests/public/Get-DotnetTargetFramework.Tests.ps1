@@ -32,17 +32,42 @@ Describe 'Output' {
         BeforeEach {
             $script:originalLocation = Get-Location
 
-            $projectPath = Join-Path $script:basePath -ChildPath 'Project.csproj'
+            $innerDirectoryName = 'inner'
+            $innerDirectoryPath = Join-Path -Path $script:basePath -ChildPath $innerDirectoryName
+            New-Item -ItemType Directory -Path $innerDirectoryPath
+
+            $projectPath = Join-Path $innerDirectoryPath -ChildPath 'Project.csproj'
             New-MSBuildFile -Path $projectPath -Contents '<TargetFramework>foo</TargetFramework>'
 
             $writeHostInvocations = [System.Collections.Generic.List[string]]::new()
             Mock Write-Host { $writeHostInvocations.Add($Object) } -ModuleName Lance
-
-            Set-Location $script:basePath
-            Get-DotnetTargetFramework -Path '.'
         }
 
-        It 'Converts relative path to absolute' {
+        It 'Converts current directory relative path to absolute' {
+            Set-Location $script:basePath
+            Get-DotnetTargetFramework -Path '.'
+
+            ($writeHostInvocations -join '') | Should -Be "foo: $projectPath"
+        }
+
+        It 'Converts current directory prefixed relative path to absolute' {
+            Set-Location $script:basePath
+            Get-DotnetTargetFramework -Path "./$innerDirectoryName"
+
+            ($writeHostInvocations -join '') | Should -Be "foo: $projectPath"
+        }
+
+        It 'Converts parent directory relative path to absolute' {
+            Set-Location $innerDirectoryPath
+            Get-DotnetTargetFramework -Path '..'
+
+            ($writeHostInvocations -join '') | Should -Be "foo: $projectPath"
+        }
+
+        It 'Converts parent directory prefixed relative path to absolute' {
+            Set-Location $innerDirectoryPath
+            Get-DotnetTargetFramework -Path "../$innerDirectoryName"
+
             ($writeHostInvocations -join '') | Should -Be "foo: $projectPath"
         }
 
