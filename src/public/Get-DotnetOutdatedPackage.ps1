@@ -32,7 +32,9 @@ function Get-DotnetOutdatedPackage {
         $letterIdProvider = [LetterIdProvider]::new()
     }
     process {
-        $packagesResult = dotnet list $Path package --outdated --format json | ConvertFrom-Json
+        # The list command does not operate as expected with the .NET 8 upgrade, so the absolute path is used instead.
+        $absolutePath = (Resolve-Path -Path $Path).Path
+        $packagesResult = dotnet list $absolutePath package --outdated --format json | ConvertFrom-Json
 
         # Projects are included in the output, whether or not they have any outdated packages. This allows affected projects to be
         # flagged for inclusion in this output.
