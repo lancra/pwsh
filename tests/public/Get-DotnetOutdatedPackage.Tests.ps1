@@ -9,13 +9,15 @@ BeforeAll {
             return Get-Content -Path $outputPath
         }
     }
+
+    $script:path = Resolve-Path .
 }
 
 Describe 'References' {
     Context 'Single Version, Single Project' {
         BeforeEach {
             Mock dotnet { Get-FakeOutput -OutputFileName 'single-version-single-project' } -ModuleName Lance -ParameterFilter {
-                "$args" -eq 'list . package --outdated --format json'
+                "$args" -eq "list $path package --outdated --format json"
             }
 
             $writeHostInvocations = [System.Collections.Generic.List[string]]::new()
@@ -38,7 +40,7 @@ Describe 'References' {
     Context 'Single Version, Multi Project' {
         BeforeEach {
             Mock dotnet { Get-FakeOutput -OutputFileName 'single-version-multi-project' } -ModuleName Lance -ParameterFilter {
-                "$args" -eq 'list . package --outdated --format json'
+                "$args" -eq "list $path package --outdated --format json"
             }
 
             $writeHostInvocations = [System.Collections.Generic.List[string]]::new()
@@ -62,7 +64,7 @@ Describe 'References' {
     Context 'Multi Version, Single Project' {
         BeforeEach {
             Mock dotnet { Get-FakeOutput -OutputFileName 'multi-version-single-project' } -ModuleName Lance -ParameterFilter {
-                "$args" -eq 'list . package --outdated --format json'
+                "$args" -eq "list $path package --outdated --format json"
             }
 
             $writeHostInvocations = [System.Collections.Generic.List[string]]::new()
@@ -87,7 +89,7 @@ Describe 'References' {
     Context 'Multi Version, Multi Project' {
         BeforeEach {
             Mock dotnet { Get-FakeOutput -OutputFileName 'multi-version-multi-project' } -ModuleName Lance -ParameterFilter {
-                "$args" -eq 'list . package --outdated --format json'
+                "$args" -eq "list $path package --outdated --format json"
             }
 
             $writeHostInvocations = [System.Collections.Generic.List[string]]::new()
@@ -115,7 +117,7 @@ Describe 'References' {
     Context 'No Version, Multi Project' {
         BeforeEach {
             Mock dotnet { Get-FakeOutput -OutputFileName 'no-version-multi-project' } -ModuleName Lance -ParameterFilter {
-                "$args" -eq 'list . package --outdated --format json'
+                "$args" -eq "list $path package --outdated --format json"
             }
 
             $writeHostInvocations = [System.Collections.Generic.List[string]]::new()
@@ -134,7 +136,7 @@ Describe 'Sorting' {
     Context 'Versions' {
         BeforeEach {
             Mock dotnet { Get-FakeOutput -OutputFileName 'version-sorting' } -ModuleName Lance -ParameterFilter {
-                "$args" -eq 'list . package --outdated --format json'
+                "$args" -eq "list $path package --outdated --format json"
             }
 
             $writeHostInvocations = [System.Collections.Generic.List[string]]::new()
@@ -171,7 +173,7 @@ Describe 'Sorting' {
     Context 'Projects' {
         BeforeEach {
             Mock dotnet { Get-FakeOutput -OutputFileName 'project-sorting' } -ModuleName Lance -ParameterFilter {
-                "$args" -eq 'list . package --outdated --format json'
+                "$args" -eq "list $path package --outdated --format json"
             }
 
             $writeHostInvocations = [System.Collections.Generic.List[string]]::new()
@@ -204,7 +206,7 @@ Describe 'Coloring' {
     Context 'Versions' {
         BeforeEach {
             Mock dotnet { Get-FakeOutput -OutputFileName 'version-sorting' } -ModuleName Lance -ParameterFilter {
-                "$args" -eq 'list . package --outdated --format json'
+                "$args" -eq "list $path package --outdated --format json"
             }
 
             Mock Write-Host -ModuleName Lance
@@ -224,7 +226,7 @@ Describe 'Coloring' {
     Context 'Projects' {
         BeforeEach {
             Mock dotnet { Get-FakeOutput -OutputFileName 'project-sorting' } -ModuleName Lance -ParameterFilter {
-                "$args" -eq 'list . package --outdated --format json'
+                "$args" -eq "list $path package --outdated --format json"
             }
 
             Mock Write-Host -ModuleName Lance

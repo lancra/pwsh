@@ -61,7 +61,7 @@ function Invoke-SubDirectoryGitCommand {
                 Write-GitRepositoryDetail -Path $_.FullName -NoHead:$NoHead -NoAheadBehind:$NoAheadBehind
 
                 $trimmedCommand = $Command.ToString().Trim()
-                if ($trimmedCommand -like 'branch-current*' -and -not $NoHead) {
+                if ($trimmedCommand -like 'noop*') {
                     # Do not show the current branch via the provided command since it is displayed along with the directory name.
                     return
                 }
