@@ -12,6 +12,10 @@ identified in the output.
 The directory to search in. The current directory is used if no value is
 provided.
 
+.PARAMETER ExcludeDirectory
+The directory name(s) to exclude from the output. They must be represented as
+children of the provided path.
+
 .PARAMETER ShowRelative
 Disables conversion of relative paths to absolute paths.
 
@@ -24,12 +28,24 @@ Gets .NET target framework for a directory.
 Get-DotnetTargetFramework
 
 Gets .NET target framework for the current directory.
+
+.EXAMPLE
+Get-DotnetTargetFramework -Path C:\Projects -ExcludeDirectory ToDo
+
+Excludes the C:\Projects\ToDo directory from the output.
+
+.EXAMPLE
+Get-DotnetTargetFramework -Path . -ShowRelative
+
+Outputs relative paths instead of converting them to absolute paths.
 #>
 function Get-DotnetTargetFramework {
     [CmdletBinding()]
     param(
         [Parameter()]
         [string]$Path = '.',
+        [Parameter()]
+        [string[]]$ExcludeDirectory = @(),
         [switch]$ShowRelative
     )
     begin {
@@ -38,8 +54,9 @@ function Get-DotnetTargetFramework {
         }
 
         # Use the absolute path by default so that the output is more clear for sharing.
+        $absolutePath = (Resolve-Path -Path $Path).Path
         if (-not $ShowRelative) {
-            $Path = (Resolve-Path -Path $Path).Path
+            $Path = $absolutePath
         }
 
         $ripgrepArgs = @(
@@ -66,6 +83,13 @@ function Get-DotnetTargetFramework {
         )
 
         $supportedVersionAggregatePattern = Join-String -InputObject $supportedVersionPatterns -Separator '|'
+
+        $excludeDirectoryPaths = $ExcludeDirectory |
+            ForEach-Object {
+                # The empty additional child path forces a separator onto the end of the path. Without a separator, the path could
+                # match on slices of strings (e.g. ./foo could match ./foobar while ./foo/ could not).
+                Join-Path -Path $absolutePath -ChildPath $_ -AdditionalChildPath ''
+            }
     }
     process {
         # Force an array when the output is a single line. <https://superuser.com/a/414666>
@@ -74,6 +98,12 @@ function Get-DotnetTargetFramework {
                 $match = $_
                 $separatorIndex = $match.LastIndexOf(':')
                 $path = $match.Substring(0, $separatorIndex)
+
+                foreach ($excludeDirectoryPath in $excludeDirectoryPaths) {
+                    if ($path -like "$excludeDirectoryPath*") {
+                        return
+                    }
+                }
 
                 $targetFrameworkCounter = 0
                 $targetFrameworks = $match.Substring($separatorIndex + 1) -split ';'

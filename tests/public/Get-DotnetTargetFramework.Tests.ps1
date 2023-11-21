@@ -192,6 +192,106 @@ Describe 'Output' {
         }
     }
 
+    Context 'Exclusions' {
+        BeforeAll {
+            function Split-HostLines {
+                [CmdletBinding()]
+                param (
+                    [Parameter(Mandatory)]
+                    [string[]]$Invocations
+                )
+                process {
+                    $invocationString = $Invocations -join ''
+                    $invocationLinesString = $invocationString -replace 'version:',("$([System.Environment]::NewLine)version:")
+                    $invocationLines = $invocationLinesString -split [System.Environment]::NewLine
+                    $invocationLines | Select-Object -Skip 1
+                }
+            }
+        }
+
+        BeforeEach {
+            $projectName = 'Project.csproj'
+            $projectContents = '<TargetFramework>version</TargetFramework>'
+
+            $fooDirectoryName = 'foo'
+            $fooDirectoryPath = Join-Path -Path $script:basePath -ChildPath $fooDirectoryName
+            $fooProjectPath = Join-Path -Path $fooDirectoryPath -ChildPath $projectName
+            New-Item -ItemType Directory -Path $fooDirectoryPath
+            New-MSBuildFile -Path $fooProjectPath -Contents $projectContents
+
+            $barDirectoryName = 'bar'
+            $barDirectoryPath = Join-Path -Path $script:basePath -ChildPath $barDirectoryName
+            $barProjectPath = Join-Path -Path $barDirectoryPath -ChildPath $projectName
+            New-Item -ItemType Directory -Path $barDirectoryPath
+            New-MSBuildFile -Path $barProjectPath -Contents $projectContents
+
+            $bazDirectoryName = 'baz'
+            $bazDirectoryPath = Join-Path -Path $barDirectoryPath -ChildPath $bazDirectoryName
+            $bazProjectPath = Join-Path -Path $bazDirectoryPath -ChildPath $projectName
+            New-Item -ItemType Directory -Path $bazDirectoryPath
+            New-MSBuildFile -Path $bazProjectPath -Contents $projectContents
+
+            $foobarDirectoryName = 'foobar'
+            $foobarDirectoryPath = Join-Path -Path $script:basePath -ChildPath $foobarDirectoryName
+            $foobarProjectPath = Join-Path -Path $foobarDirectoryPath -ChildPath $projectName
+            New-Item -ItemType Directory -Path $foobarDirectoryPath
+            New-MSBuildFile -Path $foobarProjectPath -Contents $projectContents
+
+            $writeHostInvocations = [System.Collections.Generic.List[string]]::new()
+            Mock Write-Host { $writeHostInvocations.Add($Object) } -ModuleName Lance
+        }
+
+        It 'Includes every match by default' {
+            Get-DotnetTargetFramework -Path $script:basePath
+            $writeHostLineInvocations = Split-HostLines -Invocations $writeHostInvocations
+
+            $writeHostLineInvocations | Should -Contain "version: $fooProjectPath"
+            $writeHostLineInvocations | Should -Contain "version: $barProjectPath"
+            $writeHostLineInvocations | Should -Contain "version: $bazProjectPath"
+            $writeHostLineInvocations | Should -Contain "version: $foobarProjectPath"
+        }
+
+        Context 'Partial Match' {
+            BeforeEach {
+                Get-DotnetTargetFramework -Path $script:basePath -ExcludeDirectory $fooDirectoryName
+                $script:writeHostLineInvocations = Split-HostLines -Invocations $writeHostInvocations
+            }
+
+            It 'Excludes directory based on exact name' {
+                $writeHostLineInvocations | Should -Not -Contain "version: $fooProjectPath"
+            }
+
+            It 'Does not exclude partially matched directory' {
+                $writeHostLineInvocations | Should -Contain "version: $foobarProjectPath"
+            }
+
+            It 'Includes other directories' {
+                $writeHostLineInvocations | Should -Contain "version: $barProjectPath"
+                $writeHostLineInvocations | Should -Contain "version: $bazProjectPath"
+            }
+        }
+
+        It 'Excludes multiple specified directories' {
+            Get-DotnetTargetFramework -Path $script:basePath -ExcludeDirectory @($fooDirectoryName, $foobarDirectoryName)
+            $writeHostLineInvocations = Split-HostLines -Invocations $writeHostInvocations
+
+            $writeHostLineInvocations | Should -Not -Contain "version: $fooProjectPath"
+            $writeHostLineInvocations | Should -Contain "version: $barProjectPath"
+            $writeHostLineInvocations | Should -Contain "version: $bazProjectPath"
+            $writeHostLineInvocations | Should -Not -Contain "version: $foobarProjectPath"
+        }
+
+        It 'Excludes ancestors of specified directories' {
+            Get-DotnetTargetFramework -Path $script:basePath -ExcludeDirectory $barDirectoryName
+            $writeHostLineInvocations = Split-HostLines -Invocations $writeHostInvocations
+
+            $writeHostLineInvocations | Should -Contain "version: $fooProjectPath"
+            $writeHostLineInvocations | Should -Not -Contain "version: $barProjectPath"
+            $writeHostLineInvocations | Should -Not -Contain "version: $bazProjectPath"
+            $writeHostLineInvocations | Should -Contain "version: $foobarProjectPath"
+        }
+    }
+
     AfterEach {
         Remove-Item -Path $script:basePath -Recurse -Force
     }
