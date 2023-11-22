@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param(
     [Parameter()]
-    [string]$Repository = 'Local'
+    [string]$Repository = 'Local',
+    [switch]$AllowClobber
 )
 
 function Join-Version {
@@ -50,5 +51,5 @@ if ($installedVersion -eq $manifestVersion) {
     Uninstall-Module -Name Lance -ErrorAction SilentlyContinue
 
     Write-Host 'Installing latest module version...'
-    Install-Module -Name Lance -Repository $Repository -AllowPrerelease
+    Install-Module -Name Lance -Repository $Repository -AllowPrerelease -AllowClobber:$AllowClobber
 }
