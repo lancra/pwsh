@@ -32,30 +32,31 @@ function Get-DotnetOutdatedPackage {
         $letterIdProvider = [LetterIdProvider]::new()
     }
     process {
-        # The list command does not operate as expected with the .NET 8 upgrade, so the absolute path is used instead.
+        # The list command does not operate as expected for relative paths in the .NET 8 upgrade, so the absolute path is used instead.
         $absolutePath = (Resolve-Path -Path $Path).Path
-        $packagesResult = dotnet list $absolutePath package --outdated --format json | ConvertFrom-Json
+        $packagesResultObject = dotnet list $absolutePath package --outdated --format json | ConvertFrom-Json
+        $packagesResult = [DotnetPackageListResult]::new($packagesResultObject)
 
         # Projects are included in the output, whether or not they have any outdated packages. This allows affected projects to be
         # flagged for inclusion in this output.
         $projectPaths = [System.Collections.Generic.Dictionary[string, bool]]::new()
-        foreach ($project in $packagesResult.projects) {
-            $projectPaths.Add($project.path, $false)
+        foreach ($project in $packagesResult.Projects) {
+            $projectPaths.Add($project.Path, $false)
         }
 
         $packages = [System.Collections.Generic.Dictionary[string, Package]]::new()
-        foreach ($project in $packagesResult.projects) {
-            foreach ($framework in $project.frameworks) {
-                foreach ($topLevelPackage in $framework.topLevelPackages) {
-                    $packageKey = $topLevelPackage.id
-                    $packages.TryAdd($packageKey, [Package]::new($packageKey, $topLevelPackage.latestVersion)) > $null
+        foreach ($project in $packagesResult.Projects) {
+            foreach ($framework in $project.Frameworks) {
+                foreach ($topLevelPackage in $framework.TopLevelPackages) {
+                    $packageKey = $topLevelPackage.Id
+                    $packages.TryAdd($packageKey, [Package]::new($packageKey, $topLevelPackage.LatestVersion)) > $null
                     $package = $packages[$packageKey]
 
-                    $packageReferenceKey = $topLevelPackage.resolvedVersion
+                    $packageReferenceKey = $topLevelPackage.ResolvedVersion
                     $package.References.TryAdd($packageReferenceKey, [PackageReference]::new($packageReferenceKey)) > $null
                     $packageReference = $package.References[$packageReferenceKey]
 
-                    $projectKey = $project.path
+                    $projectKey = $project.Path
                     if (-not ($packageReference.Projects -contains $projectKey)) {
                         $packageReference.Projects.Add($projectKey)
                     }
