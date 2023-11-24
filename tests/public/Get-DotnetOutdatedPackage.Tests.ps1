@@ -11,6 +11,9 @@ BeforeAll {
     }
 
     $script:path = Resolve-Path .
+
+    Mock Start-IndeterminateProgress -ModuleName Lance
+    Mock Stop-IndeterminateProgress -ModuleName Lance
 }
 
 Describe 'References' {

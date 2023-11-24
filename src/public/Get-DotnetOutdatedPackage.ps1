@@ -29,6 +29,8 @@ function Get-DotnetOutdatedPackage {
         [string]$Path = '.'
     )
     begin {
+        Start-IndeterminateProgress
+
         $letterIdProvider = [LetterIdProvider]::new()
     }
     process {
@@ -75,6 +77,8 @@ function Get-DotnetOutdatedPackage {
                 $path = $_.Key
                 $projects.Add($path, $letterIdProvider.Next($path))
             }
+
+        Stop-IndeterminateProgress
 
         $packages.GetEnumerator() |
             Sort-Object -Property Key |
