@@ -108,6 +108,8 @@ function Get-DotnetTargetFramework {
                 $targetFrameworkCounter = 0
                 $targetFrameworks = $match.Substring($separatorIndex + 1) -split ';'
 
+                $segments = @()
+
                 foreach ($targetFramework in $targetFrameworks) {
                     $targetFrameworkCounter++
 
@@ -116,14 +118,14 @@ function Get-DotnetTargetFramework {
                         $writeColor = 'Green'
                     }
 
-                    Write-Host $targetFramework -ForegroundColor $writeColor -NoNewline
-
+                    $segments += [OutputSegment]::new($targetFramework, $writeColor)
                     if ($targetFrameworkCounter -lt ($targetFrameworks.Length)) {
-                        Write-Host ';' -NoNewline
+                        $segments += [OutputSegment]::new(';')
                     }
                 }
 
-                Write-Host ": $path"
+                $segments += [OutputSegment]::new(": $path")
+                Write-HostSegment -Segments $segments
             }
     }
 }

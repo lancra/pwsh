@@ -44,69 +44,97 @@ Describe 'Output' {
             New-MSBuildFile -Path $projectPath -Contents '<TargetFramework>foo</TargetFramework>'
 
             $writeHostInvocations = [System.Collections.Generic.List[string]]::new()
-            Mock Write-Host { $writeHostInvocations.Add($Object) } -ModuleName Lance
+            Mock Write-Host { $writeHostInvocations.Add($Object ? $Object : '`n') } -ModuleName Lance
         }
 
         It 'Converts current directory relative path to absolute' {
             Set-Location $script:basePath
             Get-DotnetTargetFramework -Path '.'
+            $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
 
-            ($writeHostInvocations -join '') | Should -Be "foo: $projectPath"
+            $writeHostInvocationLines.Count | Should -Be 2
+            $writeHostInvocationLines[0] | Should -Be "foo: $projectPath"
+            $writeHostInvocationLines[1] | Should -Be ''
         }
 
         It 'Converts current directory prefixed relative path to absolute' {
             Set-Location $script:basePath
             Get-DotnetTargetFramework -Path "./$innerDirectoryName"
+            $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
 
-            ($writeHostInvocations -join '') | Should -Be "foo: $projectPath"
+            $writeHostInvocationLines.Count | Should -Be 2
+            $writeHostInvocationLines[0] | Should -Be "foo: $projectPath"
+            $writeHostInvocationLines[1] | Should -Be ''
         }
 
         It 'Converts parent directory relative path to absolute' {
             Set-Location $innerDirectoryPath
             Get-DotnetTargetFramework -Path '..'
+            $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
 
-            ($writeHostInvocations -join '') | Should -Be "foo: $projectPath"
+            $writeHostInvocationLines.Count | Should -Be 2
+            $writeHostInvocationLines[0] | Should -Be "foo: $projectPath"
+            $writeHostInvocationLines[1] | Should -Be ''
         }
 
         It 'Converts parent directory prefixed relative path to absolute' {
             Set-Location $innerDirectoryPath
             Get-DotnetTargetFramework -Path "../$innerDirectoryName"
+            $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
 
-            ($writeHostInvocations -join '') | Should -Be "foo: $projectPath"
+            $writeHostInvocationLines.Count | Should -Be 2
+            $writeHostInvocationLines[0] | Should -Be "foo: $projectPath"
+            $writeHostInvocationLines[1] | Should -Be ''
         }
 
         It 'Does not convert current directory relative path to absolute when relative is requested' {
             Set-Location $script:basePath
-            Get-DotnetTargetFramework -Path '.' -ShowRelative
-
             $expectedPath = Join-Path -Path '.' -ChildPath $innerDirectoryName -AdditionalChildPath $projectName
-            ($writeHostInvocations -join '') | Should -Be "foo: $expectedPath"
+
+            Get-DotnetTargetFramework -Path '.' -ShowRelative
+            $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
+
+            $writeHostInvocationLines.Count | Should -Be 2
+            $writeHostInvocationLines[0] | Should -Be "foo: $expectedPath"
+            $writeHostInvocationLines[1] | Should -Be ''
         }
 
         It 'Does not convert current directory prefixed relative path to absolute when relative is requested' {
             Set-Location $script:basePath
             $path = Join-Path -Path '.' -ChildPath $innerDirectoryName
-            Get-DotnetTargetFramework -Path $path -ShowRelative
-
             $expectedPath = Join-Path -Path '.' -ChildPath $innerDirectoryName -AdditionalChildPath $projectName
-            ($writeHostInvocations -join '') | Should -Be "foo: $expectedPath"
+
+            Get-DotnetTargetFramework -Path $path -ShowRelative
+            $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
+
+            $writeHostInvocationLines.Count | Should -Be 2
+            $writeHostInvocationLines[0] | Should -Be "foo: $expectedPath"
+            $writeHostInvocationLines[1] | Should -Be ''
         }
 
         It 'Does not convert parent directory relative path to absolute when relative is requested' {
             Set-Location $innerDirectoryPath
-            Get-DotnetTargetFramework -Path '..' -ShowRelative
-
             $expectedPath = Join-Path -Path '..' -ChildPath $innerDirectoryName -AdditionalChildPath $projectName
-            ($writeHostInvocations -join '') | Should -Be "foo: $expectedPath"
+
+            Get-DotnetTargetFramework -Path '..' -ShowRelative
+            $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
+
+            $writeHostInvocationLines.Count | Should -Be 2
+            $writeHostInvocationLines[0] | Should -Be "foo: $expectedPath"
+            $writeHostInvocationLines[1] | Should -Be ''
         }
 
         It 'Does not convert parent directory prefixed relative path to absolute when relative is requested' {
             Set-Location $innerDirectoryPath
             $path = Join-Path -Path '..' -ChildPath $innerDirectoryName
-            Get-DotnetTargetFramework -Path $path -ShowRelative
-
             $expectedPath = Join-Path -Path '..' -ChildPath $innerDirectoryName -AdditionalChildPath $projectName
-            ($writeHostInvocations -join '') | Should -Be "foo: $expectedPath"
+
+            Get-DotnetTargetFramework -Path $path -ShowRelative
+            $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
+
+            $writeHostInvocationLines.Count | Should -Be 2
+            $writeHostInvocationLines[0] | Should -Be "foo: $expectedPath"
+            $writeHostInvocationLines[1] | Should -Be ''
         }
 
         AfterEach {
@@ -123,17 +151,18 @@ Describe 'Output' {
             New-MSBuildFile -Path $propertiesPath -Contents '<TargetFrameworks>bar;baz</TargetFrameworks>'
 
             $writeHostInvocations = [System.Collections.Generic.List[string]]::new()
-            Mock Write-Host { $writeHostInvocations.Add($Object) } -ModuleName Lance
+            Mock Write-Host { $writeHostInvocations.Add($Object ? $Object : '`n') } -ModuleName Lance
 
             Get-DotnetTargetFramework -Path $script:basePath
+            $script:writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
         }
 
         It 'Finds project file' {
-            ($writeHostInvocations[0..1] -join '') | Should -Be "foo: $projectPath"
+            $writeHostInvocationLines[0] | Should -Be "foo: $projectPath"
         }
 
         It 'Finds properties file' {
-            ($writeHostInvocations[2..($writeHostInvocations.Count - 1)] -join '') | Should -Be "bar;baz: $propertiesPath"
+            $writeHostInvocationLines[1] | Should -Be "bar;baz: $propertiesPath"
         }
     }
 
@@ -193,22 +222,6 @@ Describe 'Output' {
     }
 
     Context 'Exclusions' {
-        BeforeAll {
-            function Split-HostLines {
-                [CmdletBinding()]
-                param (
-                    [Parameter(Mandatory)]
-                    [string[]]$Invocations
-                )
-                process {
-                    $invocationString = $Invocations -join ''
-                    $invocationLinesString = $invocationString -replace 'version:',("$([System.Environment]::NewLine)version:")
-                    $invocationLines = $invocationLinesString -split [System.Environment]::NewLine
-                    $invocationLines | Select-Object -Skip 1
-                }
-            }
-        }
-
         BeforeEach {
             $projectName = 'Project.csproj'
             $projectContents = '<TargetFramework>version</TargetFramework>'
@@ -238,57 +251,60 @@ Describe 'Output' {
             New-MSBuildFile -Path $foobarProjectPath -Contents $projectContents
 
             $writeHostInvocations = [System.Collections.Generic.List[string]]::new()
-            Mock Write-Host { $writeHostInvocations.Add($Object) } -ModuleName Lance
+            Mock Write-Host { $writeHostInvocations.Add($Object ? $Object : '`n') } -ModuleName Lance
         }
 
         It 'Includes every match by default' {
             Get-DotnetTargetFramework -Path $script:basePath
-            $writeHostLineInvocations = Split-HostLines -Invocations $writeHostInvocations
+            $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
 
-            $writeHostLineInvocations | Should -Contain "version: $fooProjectPath"
-            $writeHostLineInvocations | Should -Contain "version: $barProjectPath"
-            $writeHostLineInvocations | Should -Contain "version: $bazProjectPath"
-            $writeHostLineInvocations | Should -Contain "version: $foobarProjectPath"
+            $writeHostInvocationLines.Count | Should -Be 5
+
+            $writeHostInvocationLines[0] | Should -Be "version: $barProjectPath"
+            $writeHostInvocationLines[1] | Should -Be "version: $bazProjectPath"
+            $writeHostInvocationLines[2] | Should -Be "version: $fooProjectPath"
+            $writeHostInvocationLines[3] | Should -Be "version: $foobarProjectPath"
+            $writeHostInvocationLines[4] | Should -Be ''
         }
 
         Context 'Partial Match' {
             BeforeEach {
                 Get-DotnetTargetFramework -Path $script:basePath -ExcludeDirectory $fooDirectoryName
-                $script:writeHostLineInvocations = Split-HostLines -Invocations $writeHostInvocations
+                $script:writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
             }
 
             It 'Excludes directory based on exact name' {
-                $writeHostLineInvocations | Should -Not -Contain "version: $fooProjectPath"
+                $writeHostInvocationLines | Should -Not -Contain "version: $fooProjectPath"
             }
 
             It 'Does not exclude partially matched directory' {
-                $writeHostLineInvocations | Should -Contain "version: $foobarProjectPath"
+                $writeHostInvocationLines | Should -Contain "version: $foobarProjectPath"
             }
 
             It 'Includes other directories' {
-                $writeHostLineInvocations | Should -Contain "version: $barProjectPath"
-                $writeHostLineInvocations | Should -Contain "version: $bazProjectPath"
+                $writeHostInvocationLines | Should -Contain "version: $barProjectPath"
+                $writeHostInvocationLines | Should -Contain "version: $bazProjectPath"
             }
         }
 
         It 'Excludes multiple specified directories' {
             Get-DotnetTargetFramework -Path $script:basePath -ExcludeDirectory @($fooDirectoryName, $foobarDirectoryName)
-            $writeHostLineInvocations = Split-HostLines -Invocations $writeHostInvocations
+            $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
 
-            $writeHostLineInvocations | Should -Not -Contain "version: $fooProjectPath"
-            $writeHostLineInvocations | Should -Contain "version: $barProjectPath"
-            $writeHostLineInvocations | Should -Contain "version: $bazProjectPath"
-            $writeHostLineInvocations | Should -Not -Contain "version: $foobarProjectPath"
+            $writeHostInvocationLines | Should -Not -Contain "version: $fooProjectPath"
+            $writeHostInvocationLines | Should -Contain "version: $barProjectPath"
+            $writeHostInvocationLines | Should -Contain "version: $bazProjectPath"
+            $writeHostInvocationLines | Should -Not -Contain "version: $foobarProjectPath"
         }
 
         It 'Excludes ancestors of specified directories' {
             Get-DotnetTargetFramework -Path $script:basePath -ExcludeDirectory $barDirectoryName
-            $writeHostLineInvocations = Split-HostLines -Invocations $writeHostInvocations
+            $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
 
-            $writeHostLineInvocations | Should -Contain "version: $fooProjectPath"
-            $writeHostLineInvocations | Should -Not -Contain "version: $barProjectPath"
-            $writeHostLineInvocations | Should -Not -Contain "version: $bazProjectPath"
-            $writeHostLineInvocations | Should -Contain "version: $foobarProjectPath"
+            $writeHostInvocationLines | Should -Contain "version: $fooProjectPath"
+            $writeHostInvocationLines | Should -Not -Contain "version: $barProjectPath"
+            $writeHostInvocationLines | Should -Not -Contain "version: $bazProjectPath"
+            $writeHostInvocationLines | Should -Contain "version: $foobarProjectPath"
         }
     }
 
