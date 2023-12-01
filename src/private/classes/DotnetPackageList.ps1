@@ -61,11 +61,74 @@ class DotnetPackage {
 }
 
 class DotnetVulnerability {
-    [string]$Severity
+    [DotnetVulnerabilitySeverity]$Severity
     [string]$AdvisoryUrl
 
     DotnetVulnerability([PSCustomObject]$object) {
-        $this.Severity = $object.severity
+        $this.Severity = [DotnetVulnerabilitySeverity]::FromName($object.severity)
         $this.AdvisoryUrl = $object.advisoryUrl
+    }
+}
+
+class DotnetVulnerabilitySeverity {
+    [string]$Name
+    [System.ConsoleColor]$ForegroundColor
+    [int]$Order
+
+    hidden DotnetVulnerabilitySeverity([string]$name, [System.ConsoleColor]$foregroundColor, [int]$order) {
+        $this.Name = $name
+        $this.ForegroundColor = $foregroundColor
+        $this.Order = $order
+    }
+
+    static [DotnetVulnerabilitySeverity] FromName([string]$name) {
+        $severity = switch ($name)
+        {
+            Low { [DotnetVulnerabilitySeverity]::new($name, [System.ConsoleColor]::White, 4) }
+            Moderate { [DotnetVulnerabilitySeverity]::new($name, [System.ConsoleColor]::Yellow, 3) }
+            High { [DotnetVulnerabilitySeverity]::new($name, [System.ConsoleColor]::Red, 2) }
+            Critical { [DotnetVulnerabilitySeverity]::new($name, [System.ConsoleColor]::DarkRed, 1) }
+            default { [DotnetVulnerabilitySeverity]::new($name, [System.ConsoleColor]::Magenta, 5) }
+        }
+
+        return $severity
+    }
+}
+
+enum DotnetPackageKind {
+    Deprecated
+    Outdated
+    Vulnerable
+}
+
+enum DotnetPackageReferenceKind {
+    Direct
+    Transitive
+}
+
+class OutputPackage {
+    [string]$Id
+    [string]$LatestVersion
+    [hashtable]$References
+
+    OutputPackage([string]$id) {
+        $this.Id = $id
+        $this.References = @{}
+    }
+}
+
+class OutputPackageReference {
+    [string]$Version
+    [hashtable]$Projects
+
+    [bool]$IsDirect
+    [bool]$IsTransitive
+    [bool]$IsDeprecated
+    [DotnetVulnerability[]]$Vulnerabilities
+
+    OutputPackageReference([string]$version) {
+        $this.Version = $version
+        $this.Projects = @{}
+        $this.Vulnerabilities = @()
     }
 }

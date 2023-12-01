@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "parameters": "--deprecated",
+  "sources": ["https://api.nuget.org/v3/index.json", "/usr/nuget"],
+  "projects": [
+    {
+      "path": "/usr/git/foo.csproj",
+      "frameworks": [
+        {
+          "framework": "net5.0",
+          "topLevelPackages": [
+            {
+              "id": "Qux",
+              "requestedVersion": "0.1.0",
+              "resolvedVersion": "0.1.0",
+              "deprecationReasons": ["Other", "Legacy"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/usr/git/bar.csproj",
+      "frameworks": [
+        {
+          "framework": "net5.0",
+          "topLevelPackages": [
+            {
+              "id": "Qux",
+              "requestedVersion": "0.3.0",
+              "resolvedVersion": "0.3.0",
+              "deprecationReasons": ["Other", "Legacy"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
