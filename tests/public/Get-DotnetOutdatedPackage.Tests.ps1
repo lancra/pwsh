@@ -157,6 +157,43 @@ Describe 'References' {
             $writeHostInvocations.Count | Should -Be 0
         }
     }
+
+    Context 'Top-Level and Transitive' {
+        BeforeEach {
+            $outdatedOutput = Get-FakeOutput -OutputFileName 'top-level-and-transitive'
+            Mock Get-NuGetPackageJson { Start-ThreadJob { $using:outdatedOutput } } -ModuleName Lance -ParameterFilter {
+                $Path -eq $path -and $Kind -eq [DotnetPackageKind]::Outdated }
+            Mock Get-NuGetPackageJson { Start-ThreadJob { $using:emptyOutput } } -ModuleName Lance -ParameterFilter {
+                $Path -eq $path -and $Kind -eq [DotnetPackageKind]::Deprecated }
+            Mock Get-NuGetPackageJson { Start-ThreadJob { $using:emptyOutput } } -ModuleName Lance -ParameterFilter {
+                $Path -eq $path -and $Kind -eq [DotnetPackageKind]::Vulnerable }
+
+            $writeHostInvocations = [System.Collections.Generic.List[string]]::new()
+            Mock Write-Host { $writeHostInvocations.Add($Object ? $Object : '`n') } -ModuleName Lance
+
+            Get-DotnetOutdatedPackage -IncludeTransitive
+
+            $script:writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
+        }
+
+        It 'Identifies top-level references as direct' {
+            $writeHostInvocationLines[4] | Should -Be 'Foo: 0.1.0 -> 1.0.0 (B) [Direct]'
+        }
+
+        It 'Identifies transitive references' {
+            $writeHostInvocationLines[5] | Should -Be 'Qux: 0.1.0 -> 1.0.0 (B) [Transitive]'
+        }
+
+        It 'Identifies references that are both top-level and transitive' {
+            $writeHostInvocationLines[0] | Should -Be 'Bar: 0.1.0 -> 1.0.0 (AB) [Direct] [Transitive]'
+        }
+
+        It 'Identifies top-level and transitive references on the same package' {
+            $writeHostInvocationLines[1] | Should -Be 'Baz:'
+            $writeHostInvocationLines[2] | Should -Be '  0.1.0 -> 1.0.0 (B) [Direct]'
+            $writeHostInvocationLines[3] | Should -Be '  0.2.0 -> 1.0.0 (B) [Transitive]'
+        }
+    }
 }
 
 Describe 'Sorting' {
@@ -330,6 +367,29 @@ Describe 'Deprecations' {
             $writeHostInvocationLines[8] | Should -Be ''
         }
     }
+
+    Context 'Transitive Deprecation' {
+        BeforeEach {
+            $outdatedOutput = Get-FakeOutput -OutputFileName 'transitive-outdated'
+            Mock Get-NuGetPackageJson { Start-ThreadJob { $using:outdatedOutput } } -ModuleName Lance -ParameterFilter {
+                $Path -eq $path -and $Kind -eq [DotnetPackageKind]::Outdated }
+            $deprecatedOutput = Get-FakeOutput -OutputFileName 'transitive-deprecated'
+            Mock Get-NuGetPackageJson { Start-ThreadJob { $using:deprecatedOutput } } -ModuleName Lance -ParameterFilter {
+                $Path -eq $path -and $Kind -eq [DotnetPackageKind]::Deprecated }
+            Mock Get-NuGetPackageJson { Start-ThreadJob { $using:emptyOutput } } -ModuleName Lance -ParameterFilter {
+                $Path -eq $path -and $Kind -eq [DotnetPackageKind]::Vulnerable }
+
+            $writeHostInvocations = [System.Collections.Generic.List[string]]::new()
+            Mock Write-Host { $writeHostInvocations.Add($Object ? $Object : '`n') } -ModuleName Lance
+
+            Get-DotnetOutdatedPackage -IncludeTransitive
+        }
+
+        It 'Displays deprecation tag after transitive tag' {
+            $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
+            $writeHostInvocationLines | Should -Contain 'Bar: 0.1.0 -> 1.0.0 (A) [Transitive] [Deprecated]'
+        }
+    }
 }
 
 Describe 'Vulnerabilities' {
@@ -419,6 +479,29 @@ Describe 'Vulnerabilities' {
             $writeHostInvocationLines[6] | Should -Be 'A: /usr/git/bar.csproj'
             $writeHostInvocationLines[7] | Should -Be 'B: /usr/git/foo.csproj'
             $writeHostInvocationLines[8] | Should -Be ''
+        }
+    }
+
+    Context 'Transitive Vulnerability' {
+        BeforeEach {
+            $outdatedOutput = Get-FakeOutput -OutputFileName 'transitive-outdated'
+            Mock Get-NuGetPackageJson { Start-ThreadJob { $using:outdatedOutput } } -ModuleName Lance -ParameterFilter {
+                $Path -eq $path -and $Kind -eq [DotnetPackageKind]::Outdated }
+            Mock Get-NuGetPackageJson { Start-ThreadJob { $using:emptyOutput } } -ModuleName Lance -ParameterFilter {
+                $Path -eq $path -and $Kind -eq [DotnetPackageKind]::Deprecated }
+            $vulnerableOutput = Get-FakeOutput -OutputFileName 'transitive-vulnerable'
+            Mock Get-NuGetPackageJson { Start-ThreadJob { $using:vulnerableOutput } } -ModuleName Lance -ParameterFilter {
+                $Path -eq $path -and $Kind -eq [DotnetPackageKind]::Vulnerable }
+
+            $writeHostInvocations = [System.Collections.Generic.List[string]]::new()
+            Mock Write-Host { $writeHostInvocations.Add($Object ? $Object : '`n') } -ModuleName Lance
+
+            Get-DotnetOutdatedPackage -IncludeTransitive
+        }
+
+        It 'Displays vulnerability tag after transitive tag' {
+            $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
+            $writeHostInvocationLines | Should -Contain "Baz: 0.1.0 -> 1.0.0 (A) [Transitive] [ABCD-1234-5678-9012]"
         }
     }
 }
@@ -532,6 +615,32 @@ Describe 'Coloring' {
         It 'Writes vulnerability tag using magenta font when unknown severity' {
             Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq ' [QRST-1234-5678-9012]' -and $ForegroundColor -eq 'Magenta' }
+        }
+    }
+
+    Context 'Top-Level / Transitive' {
+        BeforeEach {
+            $outdatedOutput = Get-FakeOutput -OutputFileName 'top-level-and-transitive'
+            Mock Get-NuGetPackageJson { Start-ThreadJob { $using:outdatedOutput } } -ModuleName Lance -ParameterFilter {
+                $Path -eq $path -and $Kind -eq [DotnetPackageKind]::Outdated }
+            Mock Get-NuGetPackageJson { Start-ThreadJob { $using:emptyOutput } } -ModuleName Lance -ParameterFilter {
+                $Path -eq $path -and $Kind -eq [DotnetPackageKind]::Deprecated }
+            Mock Get-NuGetPackageJson { Start-ThreadJob { $using:emptyOutput } } -ModuleName Lance -ParameterFilter {
+                $Path -eq $path -and $Kind -eq [DotnetPackageKind]::Vulnerable }
+
+            Mock Write-Host -ModuleName Lance
+
+            Get-DotnetOutdatedPackage -IncludeTransitive
+        }
+
+        It 'Writes direct tag using magenta font' {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
+                $Object -eq ' [Direct]' -and $ForegroundColor -eq 'Magenta' }
+        }
+
+        It 'Writes transitive tag using blue font' {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
+                $Object -eq ' [Transitive]' -and $ForegroundColor -eq 'Blue' }
         }
     }
 }

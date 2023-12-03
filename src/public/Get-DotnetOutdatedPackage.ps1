@@ -12,6 +12,10 @@ identified by a unique letter.
 The directory, solution, or project to get outdated packages for. The current
 directory is used if no value is provided.
 
+.PARAMETER IncludeTransitive
+The value that determines whether transitive packages (i.e. indirect
+dependencies) are included in the output.
+
 .EXAMPLE
 Get-DotnetOutdatedPackage C:\Projects
 
@@ -26,7 +30,8 @@ function Get-DotnetOutdatedPackage {
     [CmdletBinding()]
     param(
         [Parameter()]
-        [string]$Path = '.'
+        [string]$Path = '.',
+        [switch]$IncludeTransitive
     )
     begin {
         function Set-OutputPackage {
@@ -85,7 +90,7 @@ function Get-DotnetOutdatedPackage {
         $absolutePath = (Resolve-Path -Path $Path).Path
 
         $jobs = [DotnetPackageKind].GetEnumValues() |
-            ForEach-Object { Get-NuGetPackageJson -Path $absolutePath -Kind $_ }
+            ForEach-Object { Get-NuGetPackageJson -Path $absolutePath -Kind $_ -IncludeTransitive:$IncludeTransitive }
 
         Wait-Job $jobs | Out-Null
         $packagesResults = $jobs |
@@ -176,6 +181,16 @@ function Get-DotnetOutdatedPackage {
                             }
 
                         $segments += [OutputSegment]::new(')')
+
+                        if ($IncludeTransitive) {
+                            if ($outputPackageReference.IsDirect) {
+                                $segments += [OutputSegment]::new(' [Direct]', 'Magenta')
+                            }
+
+                            if ($outputPackageReference.IsTransitive) {
+                                $segments += [OutputSegment]::new(' [Transitive]', 'Blue')
+                            }
+                        }
 
                         if ($outputPackageReference.IsDeprecated) {
                             $segments += [OutputSegment]::new(' [Deprecated]', 'DarkRed')
