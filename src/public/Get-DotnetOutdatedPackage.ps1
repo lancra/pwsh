@@ -85,6 +85,7 @@ function Get-DotnetOutdatedPackage {
 
         $letterIdProvider = [LetterIdProvider]::new()
         $latestVersionNotFound = 'Not found at the sources'
+        $nugetPackageUriPrefix = 'https://www.nuget.org/packages/'
     }
     process {
         # The list command does not operate as expected for relative paths in the .NET 8 upgrade, so the absolute path is used instead.
@@ -218,7 +219,10 @@ function Get-DotnetOutdatedPackage {
                     }
 
                 $packageSegments = @()
-                $packageSegments += [OutputSegment]::new("$($outputPackage.Id):")
+
+                $outputPackageUri = New-Hyperlink -Text $outputPackage.Id -Uri "$nugetPackageUriPrefix$($outputPackage.Id)"
+                $packageSegments += [OutputSegment]::new("$($outputPackageUri):")
+
                 if ($packageReferenceSegmentsCollection.Count -eq 1) {
                     $packageSegments += [OutputSegment]::new(' ')
                     $packageSegments += $packageReferenceSegmentsCollection[0]
