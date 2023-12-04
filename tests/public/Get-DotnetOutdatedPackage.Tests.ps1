@@ -194,6 +194,33 @@ Describe 'References' {
             $writeHostInvocationLines[3] | Should -Be '  0.2.0 -> 1.0.0 (B) [Transitive]'
         }
     }
+
+    Context 'Unknown Latest Version' {
+        BeforeEach {
+            $outdatedOutput = Get-FakeOutput -OutputFileName 'unknown-latest-version'
+            Mock Get-NuGetPackageJson { Start-ThreadJob { $using:outdatedOutput } } -ModuleName Lance -ParameterFilter {
+                $Path -eq $path -and $Kind -eq [DotnetPackageKind]::Outdated }
+            Mock Get-NuGetPackageJson { Start-ThreadJob { $using:emptyOutput } } -ModuleName Lance -ParameterFilter {
+                $Path -eq $path -and $Kind -eq [DotnetPackageKind]::Deprecated }
+            Mock Get-NuGetPackageJson { Start-ThreadJob { $using:emptyOutput } } -ModuleName Lance -ParameterFilter {
+                $Path -eq $path -and $Kind -eq [DotnetPackageKind]::Vulnerable }
+
+            $writeHostInvocations = [System.Collections.Generic.List[string]]::new()
+            Mock Write-Host { $writeHostInvocations.Add($Object ? $Object : '`n') } -ModuleName Lance
+
+            Get-DotnetOutdatedPackage
+        }
+
+        It 'Writes question mark for latest version' {
+            $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
+
+            $writeHostInvocationLines.Count | Should -Be 4
+            $writeHostInvocationLines[0] | Should -Be 'Foo: 0.1.1 -> ? (A)'
+            $writeHostInvocationLines[1] | Should -Be ''
+            $writeHostInvocationLines[2] | Should -Be 'A: /usr/git/foo.csproj'
+            $writeHostInvocationLines[3] | Should -Be ''
+        }
+    }
 }
 
 Describe 'Sorting' {
@@ -641,6 +668,28 @@ Describe 'Coloring' {
         It 'Writes transitive tag using blue font' {
             Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $Object -eq ' [Transitive]' -and $ForegroundColor -eq 'Blue' }
+        }
+    }
+
+    Context 'Unknown Latest Version' {
+        BeforeEach {
+            $outdatedOutput = Get-FakeOutput -OutputFileName 'unknown-latest-version'
+            Mock Get-NuGetPackageJson { Start-ThreadJob { $using:outdatedOutput } } -ModuleName Lance -ParameterFilter {
+                $Path -eq $path -and $Kind -eq [DotnetPackageKind]::Outdated }
+            Mock Get-NuGetPackageJson { Start-ThreadJob { $using:emptyOutput } } -ModuleName Lance -ParameterFilter {
+                $Path -eq $path -and $Kind -eq [DotnetPackageKind]::Deprecated }
+            Mock Get-NuGetPackageJson { Start-ThreadJob { $using:emptyOutput } } -ModuleName Lance -ParameterFilter {
+                $Path -eq $path -and $Kind -eq [DotnetPackageKind]::Vulnerable }
+
+                Mock Write-Host -ModuleName Lance
+
+                Get-DotnetOutdatedPackage
+        }
+
+        It 'Writes question mark using default font color' {
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
+                $Object -eq '?' -and
+                $ForegroundColor -eq [System.Console]::ForegroundColor }
         }
     }
 }

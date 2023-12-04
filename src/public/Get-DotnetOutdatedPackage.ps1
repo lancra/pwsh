@@ -84,6 +84,7 @@ function Get-DotnetOutdatedPackage {
         Start-IndeterminateProgress
 
         $letterIdProvider = [LetterIdProvider]::new()
+        $latestVersionNotFound = 'Not found at the sources'
     }
     process {
         # The list command does not operate as expected for relative paths in the .NET 8 upgrade, so the absolute path is used instead.
@@ -169,7 +170,12 @@ function Get-DotnetOutdatedPackage {
                         $segments = @()
                         $segments += [OutputSegment]::new($outputPackageReference.Version, 'Red')
                         $segments += [OutputSegment]::new(' -> ')
-                        $segments += [OutputSegment]::new($outputPackage.LatestVersion, 'Green')
+
+                        if ($outputPackage.LatestVersion -ne $latestVersionNotFound) {
+                            $segments += [OutputSegment]::new($outputPackage.LatestVersion, 'Green')
+                        } else {
+                            $segments += [OutputSegment]::new('?')
+                        }
 
                         $segments += [OutputSegment]::new(' (')
                         $outputPackageReference.Projects.GetEnumerator() |
