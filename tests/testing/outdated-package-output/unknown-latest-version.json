@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "parameters": "--outdated",
+  "sources": ["https://api.nuget.org/v3/index.json", "/usr/nuget"],
+  "projects": [
+    {
+      "path": "/usr/git/foo.csproj",
+      "frameworks": [
+        {
+          "framework": "net6.0",
+          "topLevelPackages": [
+            {
+              "id": "Foo",
+              "requestedVersion": "0.1.1",
+              "resolvedVersion": "0.1.1",
+              "latestVersion": "Not found at the sources"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
