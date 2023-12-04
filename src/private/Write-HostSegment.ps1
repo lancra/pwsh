@@ -5,17 +5,11 @@ function Write-HostSegment {
         [OutputSegment[]]$Segments
     )
     process {
-        $segmentCounter = 0
         $Segments |
-            ForEach-Object {
-                $segmentCounter++
-                $isLastSegment = $segmentCounter -eq $Segments.Length
-
+            ForEach-Object -Process {
                 Write-Host -Object $_.Text -ForegroundColor $_.ForegroundColor -NoNewline
-
-                if ($isLastSegment) {
-                    Write-Host ''
-                }
+            } -End {
+                Write-Host ''
             }
     }
 }

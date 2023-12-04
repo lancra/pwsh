@@ -1,0 +1,2 @@
+# Temporary directory may be ignored via a dotfiles repository.
+--no-ignore

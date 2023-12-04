@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "parameters": "--deprecated --include-transitive",
+  "sources": ["https://api.nuget.org/v3/index.json", "/usr/nuget"],
+  "projects": [
+    {
+      "path": "/usr/git/foo.csproj",
+      "frameworks": [
+        {
+          "framework": "net8.0",
+          "transitivePackages": [
+            {
+              "id": "Bar",
+              "requestedVersion": "0.1.0",
+              "resolvedVersion": "0.1.0",
+              "deprecationReasons": ["Other", "Legacy"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
