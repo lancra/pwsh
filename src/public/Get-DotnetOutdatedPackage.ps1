@@ -25,6 +25,11 @@ Gets outdated NuGet packages for a directory.
 Get-DotnetOutdatedPackage
 
 Gets outdated NuGet packages for the current directory.
+
+.EXAMPLE
+Get-DotnetOutdatedPackage -IncludeTransitive
+
+Gets top-level and transitive outdated NuGet packages for the current directory.
 #>
 function Get-DotnetOutdatedPackage {
     [CmdletBinding()]
