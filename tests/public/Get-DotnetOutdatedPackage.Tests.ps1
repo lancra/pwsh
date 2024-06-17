@@ -15,9 +15,9 @@ BeforeAll {
     $script:emptyOutput = Get-FakeOutput -OutputFileName 'empty'
     $script:path = Resolve-Path .
 
-    Mock Start-IndeterminateProgress -ModuleName Lance
-    Mock Stop-IndeterminateProgress -ModuleName Lance
-    Mock New-Hyperlink { $Text } -ModuleName Lance
+    Mock Invoke-IndeterminateProgressBegin -ModuleName Lance
+    Mock Invoke-IndeterminateProgressEnd -ModuleName Lance
+    Mock ConvertTo-Hyperlink { $Text } -ModuleName Lance
 }
 
 Describe 'References' {

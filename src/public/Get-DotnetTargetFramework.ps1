@@ -67,7 +67,7 @@ function Get-DotnetTargetFramework {
             "--replace '`$1'", # Replaces the match with the first regex capturing group (i.e. the XML element value).
             '--sort path',
             '--type msbuild',
-            '"<TargetFrameworks?>(.*)</TargetFrameworks?>"',
+            '"<TargetFrameworks?.*?>(.*)</TargetFrameworks?.*?>"',
             $Path
         )
         $ripgrepCommand = "rg $ripgrepArgs"
@@ -75,11 +75,14 @@ function Get-DotnetTargetFramework {
         # Must match .NET versions on a pattern due to OS-specific target frameworks (e.g. "net6.0-windows").
         # Support policy found at https://dotnet.microsoft.com/en-us/platform/support/policy.
         $supportedVersionPatterns = @(
-            'netstandard2.0', # .NET Standard for .NET Core & .NET Framework
-            'netstandard2.1', # .NET Standard for .NET Core Only
-            'net6.0*', # LTS until 2024-11-12
-            'net7.0*', # STS until 2024-05-14
-            'net8.0*' # LTS until 2026-11-10
+            'netstandard2\.0', # .NET Standard for .NET Core & .NET Framework
+            'netstandard2\.1', # .NET Standard for .NET Core Only
+            'net6\.0.*', # LTS until 2024-11-12
+            'net7\.0.*', # STS until 2024-05-14
+            'net8\.0.*', # LTS until 2026-11-10
+            'v4\.6\.2', # Until 2027-01-12
+            'v4\.7.*',
+            'v4\.8.*'
         )
 
         $supportedVersionAggregatePattern = Join-String -InputObject $supportedVersionPatterns -Separator '|'
