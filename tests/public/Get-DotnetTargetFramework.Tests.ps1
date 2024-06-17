@@ -177,11 +177,17 @@ Describe 'Output' {
             $outdatedProjectPath = Join-Path -Path $script:basePath -ChildPath 'Outdated.csproj'
             New-MSBuildFile -Path $outdatedProjectPath -Contents '<TargetFramework>net5.0</TargetFramework>'
 
+            $outdatedFrameworkProjectPath = Join-Path -Path $script:basePath -ChildPath 'OutdatedFramework.csproj'
+            New-MSBuildFile -Path $outdatedFrameworkProjectPath -Contents '<TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>'
+
             $outdatedPropertiesPath = Join-Path -Path $script:basePath -ChildPath 'Outdated.props'
             New-MSBuildFile -Path $outdatedPropertiesPath -Contents '<TargetFrameworks>netcoreapp3.1;net5.0-windows</TargetFrameworks>'
 
             $currentProjectPath = Join-Path -Path $script:basePath -ChildPath 'Current.csproj'
             New-MSBuildFile -Path $currentProjectPath -Contents '<TargetFramework>net6.0</TargetFramework>'
+
+            $currentFrameworkProjectPath = Join-Path -Path $script:basePath -ChildPath 'CurrentFramework.csproj'
+            New-MSBuildFile -Path $currentFrameworkProjectPath -Contents '<TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>'
 
             $currentPropertiesPath = Join-Path -Path $script:basePath -ChildPath 'Current.props'
             New-MSBuildFile -Path $currentPropertiesPath -Contents '<TargetFrameworks>net6.0-android;net7.0</TargetFrameworks>'
@@ -203,6 +209,11 @@ Describe 'Output' {
                 $Object -eq 'netcoreapp3.1'
             }
 
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
+                $ForegroundColor -eq 'Red' -and
+                $Object -eq 'v4.5.2'
+            }
+
             Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $ForegroundColor -eq 'Red' -and $Object -eq 'net5.0' }
             Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $ForegroundColor -eq 'Red' -and
@@ -212,6 +223,12 @@ Describe 'Output' {
 
         It 'Writes current versions using green font' {
             Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $ForegroundColor -eq 'Green' -and $Object -eq 'net6.0' }
+
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
+                $ForegroundColor -eq 'Green' -and
+                $Object -eq 'v4.7.2'
+            }
+
             Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $ForegroundColor -eq 'Green' -and
                 $Object -eq 'net6.0-android'
