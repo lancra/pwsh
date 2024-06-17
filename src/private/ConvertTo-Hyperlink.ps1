@@ -1,4 +1,4 @@
-function New-Hyperlink {
+function ConvertTo-Hyperlink {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]

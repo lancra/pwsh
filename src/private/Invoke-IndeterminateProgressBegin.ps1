@@ -1,4 +1,4 @@
-function Start-IndeterminateProgress {
+function Invoke-IndeterminateProgressBegin {
     [CmdletBinding()]
     param ()
     process {

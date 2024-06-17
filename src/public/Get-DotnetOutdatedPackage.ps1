@@ -39,7 +39,7 @@ function Get-DotnetOutdatedPackage {
         [switch]$IncludeTransitive
     )
     begin {
-        function Set-OutputPackage {
+        function Get-OutputPackage {
             [CmdletBinding()]
             param (
                 [Parameter(Mandatory)]
@@ -86,7 +86,7 @@ function Get-DotnetOutdatedPackage {
             }
         }
 
-        Start-IndeterminateProgress
+        Invoke-IndeterminateProgressBegin
 
         $letterIdProvider = [LetterIdProvider]::new()
         $latestVersionNotFound = 'Not found at the sources'
@@ -130,7 +130,7 @@ function Get-DotnetOutdatedPackage {
                             Project = $project.Path
                             Kind = [DotnetPackageReferenceKind]::Direct
                         }
-                        Set-OutputPackage @setOutputPackageArguments
+                        Get-OutputPackage @setOutputPackageArguments
                     }
 
                     foreach ($package in $framework.TransitivePackages) {
@@ -142,7 +142,7 @@ function Get-DotnetOutdatedPackage {
                             Project = $project.Path
                             Kind = [DotnetPackageReferenceKind]::Transitive
                         }
-                        Set-OutputPackage @setOutputPackageArguments
+                        Get-OutputPackage @setOutputPackageArguments
                     }
                 }
             }
@@ -157,7 +157,7 @@ function Get-DotnetOutdatedPackage {
                 $projects[$_.Key] = $letterIdProvider.Next($path)
             }
 
-        Stop-IndeterminateProgress
+        Invoke-IndeterminateProgressEnd
 
         $outputPackages.GetEnumerator() |
             Sort-Object -Property Key |
@@ -214,7 +214,7 @@ function Get-DotnetOutdatedPackage {
                                 ForEach-Object {
                                     $advisoryUri = [System.Uri]::new($_.AdvisoryUrl)
                                     $id = $advisoryUri.Segments[-1]
-                                    $link = New-Hyperlink -Text "[$id]" -Uri $_.AdvisoryUrl
+                                    $link = ConvertTo-Hyperlink -Text "[$id]" -Uri $_.AdvisoryUrl
                                     $segments += [OutputSegment]::new(" $link", $_.Severity.ForegroundColor)
                                 }
                         }
@@ -225,7 +225,7 @@ function Get-DotnetOutdatedPackage {
 
                 $packageSegments = @()
 
-                $outputPackageUri = New-Hyperlink -Text $outputPackage.Id -Uri "$nugetPackageUriPrefix$($outputPackage.Id)"
+                $outputPackageUri = ConvertTo-Hyperlink -Text $outputPackage.Id -Uri "$nugetPackageUriPrefix$($outputPackage.Id)"
                 $packageSegments += [OutputSegment]::new("$($outputPackageUri):")
 
                 if ($packageReferenceSegmentsCollection.Count -eq 1) {
