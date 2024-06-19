@@ -5,12 +5,11 @@ param(
     # Build task(s) to execute
     [ValidateSet('Init', 'Clean', 'Build', 'Analyze', 'Import', 'Pester', 'Hack', 'Test')]
     [string]$Task = 'Test',
-
     # Bootstrap dependencies
     [switch]$Bootstrap,
-
     # Executed for continuous integration
-    [switch]$CI
+    [switch]$CI,
+    [string]$TestPath = ''
 )
 
 $sut = Join-Path -Path $PSScriptRoot -ChildPath 'src'
@@ -210,8 +209,13 @@ function Pester {
             $excludedTags = @('Windows')
         }
 
+        $path = Join-Path -Path '.' -ChildPath 'tests'
+        if ($TestPath) {
+            $path = Join-Path -Path $path -ChildPath $TestPath
+        }
+
         $pesterParams = @{
-            Path = './tests'
+            Path = $path
             Output = 'Detailed'
             PassThru = $true
             ExcludeTagFilter = $excludedTags
