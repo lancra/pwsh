@@ -94,6 +94,8 @@ function Get-DotnetTargetFramework {
             }
     }
     process {
+        $maximumTargetFrameworksLength = 0
+
         # Force an array when the output is a single line. <https://superuser.com/a/414666>
         @(Invoke-Command -ScriptBlock ([scriptblock]::Create($ripgrepCommand))) |
             ForEach-Object {
@@ -108,6 +110,9 @@ function Get-DotnetTargetFramework {
                 }
 
                 $targetFrameworksRaw = $match.Substring($separatorIndex + 1)
+                if ($targetFrameworksRaw.Length -gt $maximumTargetFrameworksLength) {
+                    $maximumTargetFrameworksLength = $targetFrameworksRaw.Length
+                }
 
                 @{
                     Path = $path
@@ -116,6 +121,7 @@ function Get-DotnetTargetFramework {
             } |
             Sort-Object -Property { [regex]::Replace($_.Path, '\d+|\\|/', { $args[0].Value.PadLeft(5) }) } |
             ForEach-Object {
+                $targetFrameworkCounter = 0
                 $segments = @()
 
                 foreach ($targetFramework in $_.TargetFrameworks) {
@@ -132,7 +138,10 @@ function Get-DotnetTargetFramework {
                     }
                 }
 
-                $segments += [OutputSegment]::new(": $($_.Path)")
+                $targetFrameworksLength = ($_.TargetFrameworks -join ';').Length
+                $paddingSpaces = [string]::new(' ', $maximumTargetFrameworksLength - $targetFrameworksLength)
+
+                $segments += [OutputSegment]::new(": $paddingSpaces$($_.Path)")
                 Write-HostSegment -Segments $segments
             }
     }
