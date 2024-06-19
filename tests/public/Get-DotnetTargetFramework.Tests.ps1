@@ -277,8 +277,8 @@ Describe 'Output' {
 
             $writeHostInvocationLines.Count | Should -Be 5
 
-            $writeHostInvocationLines[0] | Should -Be "version: $barProjectPath"
-            $writeHostInvocationLines[1] | Should -Be "version: $bazProjectPath"
+            $writeHostInvocationLines[0] | Should -Be "version: $bazProjectPath"
+            $writeHostInvocationLines[1] | Should -Be "version: $barProjectPath"
             $writeHostInvocationLines[2] | Should -Be "version: $fooProjectPath"
             $writeHostInvocationLines[3] | Should -Be "version: $foobarProjectPath"
             $writeHostInvocationLines[4] | Should -Be ''
@@ -322,6 +322,36 @@ Describe 'Output' {
             $writeHostInvocationLines | Should -Not -Contain "version: $barProjectPath"
             $writeHostInvocationLines | Should -Not -Contain "version: $bazProjectPath"
             $writeHostInvocationLines | Should -Contain "version: $foobarProjectPath"
+        }
+    }
+
+    Context 'Sorting' {
+        BeforeEach {
+            $projectContents = '<TargetFramework>net8.0</TargetFramework>'
+
+            $thirdProjectPath = Join-Path -Path $script:basePath -ChildPath 'C' -AdditionalChildPath 'Project.csproj'
+            New-MSBuildFile -Path $thirdProjectPath -Contents $projectContents
+
+            $secondProjectPath = Join-Path -Path $script:basePath -ChildPath 'B' -AdditionalChildPath 'Project.csproj'
+            New-MSBuildFile -Path $secondProjectPath -Contents $projectContents
+
+            $firstProjectPath = Join-Path -Path $script:basePath -ChildPath 'A' -AdditionalChildPath 'Project.csproj'
+            New-MSBuildFile -Path $firstProjectPath -Contents $projectContents
+
+            $writeHostInvocations = [System.Collections.Generic.List[string]]::new()
+            Mock Write-Host { $writeHostInvocations.Add($Object ? $Object : '`n') } -ModuleName Lance
+        }
+
+        It 'Sorts results by path' {
+            Get-DotnetTargetFramework -Path $script:basePath
+            $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
+
+            $writeHostInvocationLines.Count | Should -Be 4
+
+            $writeHostInvocationLines[0] | Should -Be "net8.0: $firstProjectPath"
+            $writeHostInvocationLines[1] | Should -Be "net8.0: $secondProjectPath"
+            $writeHostInvocationLines[2] | Should -Be "net8.0: $thirdProjectPath"
+            $writeHostInvocationLines[3] | Should -Be ''
         }
     }
 
