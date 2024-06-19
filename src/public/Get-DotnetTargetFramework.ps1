@@ -65,7 +65,6 @@ function Get-DotnetTargetFramework {
             '--no-line-number',
             '--only-matching',
             "--replace '`$1'", # Replaces the match with the first regex capturing group (i.e. the XML element value).
-            '--sort path',
             '--type msbuild',
             '"<TargetFrameworks?.*?>(.*)</TargetFrameworks?.*?>"',
             $Path
@@ -95,25 +94,37 @@ function Get-DotnetTargetFramework {
             }
     }
     process {
+        $maximumTargetFrameworksLength = 0
+
         # Force an array when the output is a single line. <https://superuser.com/a/414666>
         @(Invoke-Command -ScriptBlock ([scriptblock]::Create($ripgrepCommand))) |
             ForEach-Object {
                 $match = $_
                 $separatorIndex = $match.LastIndexOf(':')
-                $path = $match.Substring(0, $separatorIndex)
 
+                $path = $match.Substring(0, $separatorIndex)
                 foreach ($excludeDirectoryPath in $excludeDirectoryPaths) {
                     if ($path -like "$excludeDirectoryPath*") {
                         return
                     }
                 }
 
-                $targetFrameworkCounter = 0
-                $targetFrameworks = $match.Substring($separatorIndex + 1) -split ';'
+                $targetFrameworksRaw = $match.Substring($separatorIndex + 1)
+                if ($targetFrameworksRaw.Length -gt $maximumTargetFrameworksLength) {
+                    $maximumTargetFrameworksLength = $targetFrameworksRaw.Length
+                }
 
+                @{
+                    Path = $path
+                    TargetFrameworks = $targetFrameworksRaw -split ';'
+                }
+            } |
+            Sort-Object -Property { [regex]::Replace($_.Path, '\d+|\\|/', { $args[0].Value.PadLeft(5) }) } |
+            ForEach-Object {
+                $targetFrameworkCounter = 0
                 $segments = @()
 
-                foreach ($targetFramework in $targetFrameworks) {
+                foreach ($targetFramework in $_.TargetFrameworks) {
                     $targetFrameworkCounter++
 
                     $writeColor = 'Red'
@@ -122,12 +133,15 @@ function Get-DotnetTargetFramework {
                     }
 
                     $segments += [OutputSegment]::new($targetFramework, $writeColor)
-                    if ($targetFrameworkCounter -lt ($targetFrameworks.Length)) {
+                    if ($targetFrameworkCounter -lt ($_.TargetFrameworks.Length)) {
                         $segments += [OutputSegment]::new(';')
                     }
                 }
 
-                $segments += [OutputSegment]::new(": $path")
+                $targetFrameworksLength = ($_.TargetFrameworks -join ';').Length
+                $paddingSpaces = [string]::new(' ', $maximumTargetFrameworksLength - $targetFrameworksLength)
+
+                $segments += [OutputSegment]::new(": $paddingSpaces$($_.Path)")
                 Write-HostSegment -Segments $segments
             }
     }
