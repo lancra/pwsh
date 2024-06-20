@@ -58,13 +58,12 @@ Describe 'Module Manifest' {
             {[guid]::Parse($script:manifestData.Guid)} | Should -Not -Throw
         }
 
-        # TODO: Enable these before first release.
-        It 'Has a valid version in the changelog' -Skip {
+        It 'Has a valid version in the changelog' {
             $script:changelogVersion | Should -Not -BeNullOrEmpty
             $script:changelogVersion -as [Version] | Should -Not -BeNullOrEmpty
         }
 
-        It 'Changelog and manifest versions match' -Skip {
+        It 'Changelog and manifest versions match' {
             $script:changelogVersion -as [Version] | Should -Be ( $script:manifestData.Version -as [Version] )
         }
     }

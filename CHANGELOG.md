@@ -7,12 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0]
+
 ### Added
 
-- Add Invoke-SubDirectoryGitCommand function (#1).
-- Add Write-GitRepositoryDetail function (#1).
-- Add Remove-BuildArtifact function (#2).
-- Add Resolve-Error function (#3).
-- Add Stop-Wsl function (#3).
+- Add Invoke-SubDirectoryGitCommand cmdlet (#1).
+- Add Write-GitRepositoryDetail cmdlet (#1).
+- Add Remove-BuildArtifact cmdlet (#2).
+- Add Resolve-Error cmdlet (#3).
+- Add Stop-Wsl cmdlet (#3).
+- Add Test-PathExecutable cmdlet (#4).
+- Add Get-DotnetTargetFramework cmdlet (#4).
+- Add Get-DotnetOutdatedPackage cmdlet (#5).
 
-[unreleased]: https://github.com/lancra/pwsh/compare/v0.1.0-preview0...HEAD
+[unreleased]: https://github.com/lancra/pwsh/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/lancra/pwsh/releases/tag/v0.1.0
