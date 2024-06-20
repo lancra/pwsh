@@ -58,36 +58,13 @@ Describe 'Module Manifest' {
             {[guid]::Parse($script:manifestData.Guid)} | Should -Not -Throw
         }
 
-        # TODO: Enable these before first release.
-        It 'Has a valid version in the changelog' -Skip {
+        It 'Has a valid version in the changelog' {
             $script:changelogVersion | Should -Not -BeNullOrEmpty
             $script:changelogVersion -as [Version] | Should -Not -BeNullOrEmpty
         }
 
-        It 'Changelog and manifest versions match' -Skip {
+        It 'Changelog and manifest versions match' {
             $script:changelogVersion -as [Version] | Should -Be ( $script:manifestData.Version -as [Version] )
         }
-    }
-}
-
-Describe 'Git Tags' -Skip {
-    BeforeAll {
-        $script:gitTagVersion = $null
-        if (Get-Command git -CommandType Application -ErrorAction SilentlyContinue) {
-            # Aliased on my machine as "tags-latest".
-            $tagMessage = git log --tags --decorate --oneline --simplify-by-decoration -1 --format='%(describe:tags)'
-            if ($tagMessage -and $tagMessage[0] -eq 'v') {
-                $script:gitTagVersion = $tagMessage
-            }
-        }
-    }
-
-    It 'Has a valid version tag' {
-        $script:gitTagVersion | Should -Not -BeNullOrEmpty
-        $script:gitTagVersion -as [Version] | Should -Not -BeNullOrEmpty
-    }
-
-    It 'Tag and manifest versions match' {
-        $script:manifestData.Version -as [Version] | Should -Be ( $script:gitTagVersion -as [Version])
     }
 }
