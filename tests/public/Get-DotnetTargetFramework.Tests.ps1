@@ -387,6 +387,52 @@ Describe 'Output' {
         }
     }
 
+    Context 'Json Format' {
+        BeforeEach {
+            $coreProjectPath = Join-Path -Path $script:basePath -ChildPath '1.csproj'
+            New-MSBuildFile -Path $coreProjectPath -Contents '<TargetFramework>net8.0</TargetFramework>'
+
+            $frameworkProjectPath = Join-Path -Path $script:basePath -ChildPath '2.csproj'
+            New-MSBuildFile -Path $frameworkProjectPath -Contents '<TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>'
+
+            $propertiesPath = Join-Path -Path $script:basePath -ChildPath '3.props'
+            New-MSBuildFile -Path $propertiesPath -Contents '<TargetFrameworks>net8.0-android;net7.0</TargetFrameworks>'
+
+            $script:output = Get-DotnetTargetFramework -Path $script:basePath -Format 'Json' |
+                ConvertFrom-Json
+        }
+
+        It 'Outputs array of all projects' {
+            $output.Count | Should -Be 3
+        }
+
+        It 'Outputs core project with a single target version' {
+            $project = $output[0]
+            $project.path | Should -Be $coreProjectPath
+            $project.targetFrameworks.Count | Should -Be 1
+            $project.targetFrameworks[0].value | Should -Be 'net8.0'
+            $project.targetFrameworks[0].supported | Should -Be $true
+        }
+
+        It 'Outputs framework project with a single target version' {
+            $project = $output[1]
+            $project.path | Should -Be $frameworkProjectPath
+            $project.targetFrameworks.Count | Should -Be 1
+            $project.targetFrameworks[0].value | Should -Be 'v4.5.2'
+            $project.targetFrameworks[0].supported | Should -Be $false
+        }
+
+        It 'Outputs core project with multiple target versions' {
+            $project = $output[2]
+            $project.path | Should -Be $propertiesPath
+            $project.targetFrameworks.Count | Should -Be 2
+            $project.targetFrameworks[0].value | Should -Be 'net8.0-android'
+            $project.targetFrameworks[0].supported | Should -Be $true
+            $project.targetFrameworks[1].value | Should -Be 'net7.0'
+            $project.targetFrameworks[1].supported | Should -Be $false
+        }
+    }
+
     AfterEach {
         Remove-Item -Path $script:basePath -Recurse -Force
     }
