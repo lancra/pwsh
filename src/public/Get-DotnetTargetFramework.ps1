@@ -53,11 +53,9 @@ function Get-DotnetTargetFramework {
             throw 'ripgrep must be installed and available on the path for this script.'
         }
 
-        # Use the absolute path by default so that the output is more clear for sharing.
-        $absolutePath = (Resolve-Path -Path $Path).Path
-        if (-not $ShowRelative) {
-            $Path = $absolutePath
-        }
+        # Use the absolute path by default for clarity. A trailing separator is forced onto the end of the path via the empty child
+        # path so that relative path outputs do not begin with a leading separator.
+        $Path = Join-Path -Path (Resolve-Path -Path $Path).Path -ChildPath ''
 
         $ripgrepArgs = @(
             '--ignore-case',
@@ -90,7 +88,7 @@ function Get-DotnetTargetFramework {
             ForEach-Object {
                 # The empty additional child path forces a separator onto the end of the path. Without a separator, the path could
                 # match on slices of strings (e.g. ./foo could match ./foobar while ./foo/ could not).
-                Join-Path -Path $absolutePath -ChildPath $_ -AdditionalChildPath ''
+                Join-Path -Path $Path -ChildPath $_ -AdditionalChildPath ''
             }
     }
     process {
@@ -102,11 +100,15 @@ function Get-DotnetTargetFramework {
                 $match = $_
                 $separatorIndex = $match.LastIndexOf(':')
 
-                $path = $match.Substring(0, $separatorIndex)
+                $matchPath = $match.Substring(0, $separatorIndex)
                 foreach ($excludeDirectoryPath in $excludeDirectoryPaths) {
-                    if ($path -like "$excludeDirectoryPath*") {
+                    if ($matchPath -like "$excludeDirectoryPath*") {
                         return
                     }
+                }
+
+                if ($ShowRelative) {
+                    $matchPath = $matchPath.Replace($Path, '')
                 }
 
                 $targetFrameworksRaw = $match.Substring($separatorIndex + 1)
@@ -115,7 +117,7 @@ function Get-DotnetTargetFramework {
                 }
 
                 @{
-                    Path = $path
+                    Path = $matchPath
                     TargetFrameworks = $targetFrameworksRaw -split ';'
                 }
             } |

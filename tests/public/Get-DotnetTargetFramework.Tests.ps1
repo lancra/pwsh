@@ -89,7 +89,7 @@ Describe 'Output' {
 
         It 'Does not convert current directory relative path to absolute when relative is requested' {
             Set-Location $script:basePath
-            $expectedPath = Join-Path -Path '.' -ChildPath $innerDirectoryName -AdditionalChildPath $projectName
+            $expectedPath = Join-Path -Path $innerDirectoryName -ChildPath $projectName
 
             Get-DotnetTargetFramework -Path '.' -ShowRelative
             $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
@@ -102,7 +102,7 @@ Describe 'Output' {
         It 'Does not convert current directory prefixed relative path to absolute when relative is requested' {
             Set-Location $script:basePath
             $path = Join-Path -Path '.' -ChildPath $innerDirectoryName
-            $expectedPath = Join-Path -Path '.' -ChildPath $innerDirectoryName -AdditionalChildPath $projectName
+            $expectedPath = $projectName
 
             Get-DotnetTargetFramework -Path $path -ShowRelative
             $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
@@ -114,7 +114,7 @@ Describe 'Output' {
 
         It 'Does not convert parent directory relative path to absolute when relative is requested' {
             Set-Location $innerDirectoryPath
-            $expectedPath = Join-Path -Path '..' -ChildPath $innerDirectoryName -AdditionalChildPath $projectName
+            $expectedPath = Join-Path -Path $innerDirectoryName -ChildPath $projectName
 
             Get-DotnetTargetFramework -Path '..' -ShowRelative
             $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
@@ -127,7 +127,7 @@ Describe 'Output' {
         It 'Does not convert parent directory prefixed relative path to absolute when relative is requested' {
             Set-Location $innerDirectoryPath
             $path = Join-Path -Path '..' -ChildPath $innerDirectoryName
-            $expectedPath = Join-Path -Path '..' -ChildPath $innerDirectoryName -AdditionalChildPath $projectName
+            $expectedPath = $projectName
 
             Get-DotnetTargetFramework -Path $path -ShowRelative
             $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
