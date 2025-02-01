@@ -76,6 +76,11 @@ function Invoke-SubDirectoryGitCommand {
 
         Get-ChildItem -Path $Path -Directory |
             ForEach-Object {
+                $gitDirectory = Join-Path -Path $_ -ChildPath '.git'
+                if (-not (Test-Path -Path $gitDirectory)) {
+                    return
+                }
+
                 Write-GitRepositoryDetail -Path $_.FullName -NoHead:$NoHead -NoAheadBehind:$NoAheadBehind
 
                 $trimmedCommandText = $CommandText.Trim()
