@@ -148,13 +148,13 @@ function Get-DotnetTargetFramework {
         $ripgrepCommand = "rg $ripgrepArgs"
 
         # Must match .NET versions on a pattern due to OS-specific target frameworks (e.g. "net6.0-windows").
-        # Support policy found at https://dotnet.microsoft.com/en-us/platform/support/policy.
+        # Core Support Policy: https://dotnet.microsoft.com/en-us/platform/support/policy.
+        # Framework Support Policy: https://learn.microsoft.com/en-us/lifecycle/products/microsoft-net-framework.
         $supportedVersionPatterns = @(
             'netstandard2\.0', # .NET Standard for .NET Core & .NET Framework
             'netstandard2\.1', # .NET Standard for .NET Core Only
-            'net6\.0.*', # LTS until 2024-11-12
-            'net7\.0.*', # STS until 2024-05-14
             'net8\.0.*', # LTS until 2026-11-10
+            'net9\.0.*', # STS until 2026-05-12
             'v4\.6\.2', # Until 2027-01-12
             'v4\.7.*',
             'v4\.8.*'
