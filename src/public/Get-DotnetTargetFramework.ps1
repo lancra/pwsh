@@ -19,6 +19,9 @@ children of the provided path.
 .PARAMETER ShowRelative
 Disables conversion of relative paths to absolute paths.
 
+.PARAMETER Format
+The output format for the results. The default is Human.
+
 .EXAMPLE
 Get-DotnetTargetFramework C:\Projects
 
@@ -38,6 +41,11 @@ Excludes the C:\Projects\ToDo directory from the output.
 Get-DotnetTargetFramework -Path . -ShowRelative
 
 Outputs relative paths instead of converting them to absolute paths.
+
+.EXAMPLE
+Get-DotnetTargetFramework -Path . -Format Json
+
+Outputs results as a JSON array.
 #>
 function Get-DotnetTargetFramework {
     [CmdletBinding()]
@@ -46,18 +54,86 @@ function Get-DotnetTargetFramework {
         [string]$Path = '.',
         [Parameter()]
         [string[]]$ExcludeDirectory = @(),
-        [switch]$ShowRelative
+        [switch]$ShowRelative,
+        [Parameter()]
+        [ValidateSet('Human', 'Json')]
+        [string]$Format = 'Human'
     )
     begin {
+        class ProjectTargetFramework {
+            [string] $Value
+            [bool] $Supported
+
+            ProjectTargetFramework([string] $value, [bool] $supported) {
+                $this.Value = $value
+                $this.Supported = $supported
+            }
+        }
+
+        class Project {
+            [string] $Path
+            [ProjectTargetFramework[]] $TargetFrameworks
+
+            Project([string] $path, [ProjectTargetFramework[]] $targetFrameworks) {
+                $this.Path = $path
+                $this.TargetFrameworks = $targetFrameworks
+            }
+        }
+
+        class ProjectList {
+            [Project[]] $Projects
+
+            [string] ToJson() {
+                $options = [System.Text.Json.JsonSerializerOptions]@{
+                    PropertyNamingPolicy = [System.Text.Json.JsonNamingPolicy]::CamelCase
+                    WriteIndented = $true
+                }
+
+                return [System.Text.Json.JsonSerializer]::Serialize($this.Projects, $options)
+            }
+
+            ProjectList([Project[]] $projects) {
+                $this.Projects = $projects
+            }
+        }
+
+        function Write-ProjectHuman {
+            [CmdletBinding()]
+            param(
+                [Parameter(Mandatory)]
+                [Project] $Project
+            )
+            process {
+                $targetFrameworkCounter = 0
+                $segments = @()
+
+                foreach ($targetFramework in $Project.TargetFrameworks) {
+                    $targetFrameworkCounter++
+
+                    $writeColor = $targetFramework.Supported ? 'Green' : 'Red'
+                    $segments += [OutputSegment]::new($targetFramework.Value, $writeColor)
+
+                    if ($targetFrameworkCounter -lt ($Project.TargetFrameworks.Length)) {
+                        $segments += [OutputSegment]::new(';')
+                    }
+                }
+
+                $targetFrameworkValuesString = ($Project.TargetFrameworks | Select-Object -ExpandProperty Value) -join ';'
+                $targetFrameworksLength = $targetFrameworkValuesString.Length
+                $paddingSpaces = [string]::new(' ', $maximumTargetFrameworksLength - $targetFrameworksLength)
+
+                $segments += [OutputSegment]::new(": $paddingSpaces$($Project.Path)")
+                Write-HostSegment -Segments $segments
+            }
+        }
+
         if (-not (Test-PathExecutable -Executable 'rg')) {
             throw 'ripgrep must be installed and available on the path for this script.'
         }
 
-        # Use the absolute path by default so that the output is more clear for sharing.
-        $absolutePath = (Resolve-Path -Path $Path).Path
-        if (-not $ShowRelative) {
-            $Path = $absolutePath
-        }
+        # Use the absolute path by default for clarity. A trailing separator is forced onto the end of the path via the empty child
+        # path so that relative path outputs do not begin with a leading separator.
+        $Path = Join-Path -Path (Resolve-Path -Path $Path).Path -ChildPath ''
 
         $ripgrepArgs = @(
             '--ignore-case',
@@ -72,13 +148,13 @@ function Get-DotnetTargetFramework {
         $ripgrepCommand = "rg $ripgrepArgs"
 
         # Must match .NET versions on a pattern due to OS-specific target frameworks (e.g. "net6.0-windows").
-        # Support policy found at https://dotnet.microsoft.com/en-us/platform/support/policy.
+        # Core Support Policy: https://dotnet.microsoft.com/en-us/platform/support/policy.
+        # Framework Support Policy: https://learn.microsoft.com/en-us/lifecycle/products/microsoft-net-framework.
         $supportedVersionPatterns = @(
             'netstandard2\.0', # .NET Standard for .NET Core & .NET Framework
             'netstandard2\.1', # .NET Standard for .NET Core Only
-            'net6\.0.*', # LTS until 2024-11-12
-            'net7\.0.*', # STS until 2024-05-14
             'net8\.0.*', # LTS until 2026-11-10
+            'net9\.0.*', # STS until 2026-05-12
             'v4\.6\.2', # Until 2027-01-12
             'v4\.7.*',
             'v4\.8.*'
@@ -90,59 +166,52 @@ function Get-DotnetTargetFramework {
             ForEach-Object {
                 # The empty additional child path forces a separator onto the end of the path. Without a separator, the path could
                 # match on slices of strings (e.g. ./foo could match ./foobar while ./foo/ could not).
-                Join-Path -Path $absolutePath -ChildPath $_ -AdditionalChildPath ''
+                Join-Path -Path $Path -ChildPath $_ -AdditionalChildPath ''
             }
     }
     process {
         $maximumTargetFrameworksLength = 0
 
         # Force an array when the output is a single line. <https://superuser.com/a/414666>
-        @(Invoke-Command -ScriptBlock ([scriptblock]::Create($ripgrepCommand))) |
+        $projects = @(Invoke-Command -ScriptBlock ([scriptblock]::Create($ripgrepCommand))) |
             ForEach-Object {
                 $match = $_
                 $separatorIndex = $match.LastIndexOf(':')
 
-                $path = $match.Substring(0, $separatorIndex)
+                $matchPath = $match.Substring(0, $separatorIndex)
                 foreach ($excludeDirectoryPath in $excludeDirectoryPaths) {
-                    if ($path -like "$excludeDirectoryPath*") {
+                    if ($matchPath -like "$excludeDirectoryPath*") {
                         return
                     }
                 }
 
-                $targetFrameworksRaw = $match.Substring($separatorIndex + 1)
-                if ($targetFrameworksRaw.Length -gt $maximumTargetFrameworksLength) {
-                    $maximumTargetFrameworksLength = $targetFrameworksRaw.Length
+                if ($ShowRelative) {
+                    $matchPath = $matchPath.Replace($Path, '')
                 }
 
-                @{
-                    Path = $path
-                    TargetFrameworks = $targetFrameworksRaw -split ';'
+                $targetFrameworkValuesString = $match.Substring($separatorIndex + 1)
+                if ($targetFrameworkValuesString.Length -gt $maximumTargetFrameworksLength) {
+                    $maximumTargetFrameworksLength = $targetFrameworkValuesString.Length
                 }
+
+                $targetFrameworks = $targetFrameworkValuesString -split ';' |
+                    ForEach-Object {
+                        [ProjectTargetFramework]::new($_, $_ -match $supportedVersionAggregatePattern)
+                    }
+
+                [Project]::new($matchPath, $targetFrameworks)
             } |
-            Sort-Object -Property { [regex]::Replace($_.Path, '\d+|\\|/', { $args[0].Value.PadLeft(5) }) } |
-            ForEach-Object {
-                $targetFrameworkCounter = 0
-                $segments = @()
+            Sort-Object -Property { [regex]::Replace($_.Path, '\d+|\\|/', { $args[0].Value.PadLeft(5) }) }
+        $projectList = [ProjectList]::new($projects)
 
-                foreach ($targetFramework in $_.TargetFrameworks) {
-                    $targetFrameworkCounter++
-
-                    $writeColor = 'Red'
-                    if ($targetFramework -match $supportedVersionAggregatePattern) {
-                        $writeColor = 'Green'
-                    }
-
-                    $segments += [OutputSegment]::new($targetFramework, $writeColor)
-                    if ($targetFrameworkCounter -lt ($_.TargetFrameworks.Length)) {
-                        $segments += [OutputSegment]::new(';')
-                    }
+        if ($Format -eq 'Human') {
+            $projects |
+                ForEach-Object {
+                    Write-ProjectHuman -Project $_
                 }
-
-                $targetFrameworksLength = ($_.TargetFrameworks -join ';').Length
-                $paddingSpaces = [string]::new(' ', $maximumTargetFrameworksLength - $targetFrameworksLength)
-
-                $segments += [OutputSegment]::new(": $paddingSpaces$($_.Path)")
-                Write-HostSegment -Segments $segments
-            }
+        } elseif ($Format -eq 'Json') {
+            $projectList.ToJson() |
+                Write-Output
+        }
     }
 }
