@@ -15,10 +15,10 @@ BeforeAll {
     $script:manifestData = Test-ModuleManifest @manifestDataParams
 
     $changelogPath = Join-Path -Path $env:BHProjectPath -Child 'CHANGELOG.md'
-    $script:changelogVersion = Get-Content $changelogPath |
+    $script:changelogVersionText = Get-Content $changelogPath |
         ForEach-Object {
             if ($_ -match '^##\s\[(?<Version>(\d+\.){1,3}\d+)\]') {
-                $script:changelogVersion = $matches.Version
+                $script:changelogVersionText = $matches.Version
                 break
             }
         }
@@ -59,12 +59,36 @@ Describe 'Module Manifest' {
         }
 
         It 'Has a valid version in the changelog' {
-            $script:changelogVersion | Should -Not -BeNullOrEmpty
-            $script:changelogVersion -as [Version] | Should -Not -BeNullOrEmpty
+            $script:changelogVersionText | Should -Not -BeNullOrEmpty
+            $script:changelogVersionText -as [Version] | Should -Not -BeNullOrEmpty
         }
 
         It 'Changelog and manifest versions match' {
-            $script:changelogVersion -as [Version] | Should -Be ( $script:manifestData.Version -as [Version] )
+            $manifestVersion = $script:manifestData.Version -as [Version]
+            $changelogVersion = $script:changelogVersionText -as [Version]
+
+            if (-not $script:manifestData.PrivateData.PSData.Prerelease) {
+                $changelogVersion | Should -Be ( $manifestVersion )
+            } else {
+                $manifestVersionOptions = @()
+
+                if ($manifestVersion.Major -ne 0) {
+                    $manifestVersionOptions += `
+                        [Version]::new($manifestVersion.Major - 1, $manifestVersion.Minor, $manifestVersion.Build)
+                }
+
+                if ($manifestVersion.Minor -ne 0) {
+                    $manifestVersionOptions += `
+                        [Version]::new($manifestVersion.Major, $manifestVersion.Minor - 1, $manifestVersion.Build)
+                }
+
+                if ($manifestVersion.Build -ne 0) {
+                    $manifestVersionOptions += `
+                        [Version]::new($manifestVersion.Major, $manifestVersion.Minor, $manifestVersion.Build - 1)
+                }
+
+                $changelogVersion | Should -BeIn $manifestVersionOptions
+            }
         }
     }
 }
