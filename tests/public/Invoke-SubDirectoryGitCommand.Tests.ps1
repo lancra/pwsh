@@ -1,5 +1,18 @@
 BeforeAll {
     . $PSScriptRoot/../testing/New-TemporaryDirectory.ps1
+
+    function New-GitRepository {
+        param(
+            [Parameter(Mandatory)]
+            [string] $Path
+        )
+        process {
+            New-Item -ItemType Directory -Path $Path
+
+            $gitDirectoryPath = Join-Path -Path $Path -ChildPath '.git'
+            New-Item -ItemType Directory -Path $gitDirectoryPath
+        }
+    }
 }
 
 Describe 'Command Execution' {
@@ -8,13 +21,13 @@ Describe 'Command Execution' {
             $basePath = New-TemporaryDirectory
 
             $fooPath = Join-Path -Path $basePath -ChildPath 'foo'
-            New-Item -ItemType Directory -Path $fooPath
+            New-GitRepository -Path $fooPath
 
             $barPath = Join-Path -Path $basePath -ChildPath 'bar'
-            New-Item -ItemType Directory -Path $barPath
+            New-GitRepository $barPath
 
             $bazPath = Join-Path -Path $basePath -ChildPath 'baz'
-            New-Item -ItemType Directory -Path $bazPath
+            New-GitRepository -Path $bazPath
 
             Mock Write-GitRepositoryDetail -ModuleName Lance
             Mock git -ModuleName Lance
@@ -54,7 +67,7 @@ Describe 'Command Execution' {
             $basePath = New-TemporaryDirectory
 
             $childPath = Join-Path -Path $basePath -ChildPath 'child'
-            New-Item -ItemType Directory -Path $childPath
+            New-GitRepository -Path $childPath
 
             Mock Write-GitRepositoryDetail -ModuleName Lance
             Mock git -ModuleName Lance
@@ -72,6 +85,6 @@ Describe 'Command Execution' {
     }
 
     AfterEach {
-        Remove-Item -Path $basePath -Recurse
+        Remove-Item -Path $basePath -Recurse -Force
     }
 }

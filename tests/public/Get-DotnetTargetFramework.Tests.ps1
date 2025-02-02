@@ -89,7 +89,7 @@ Describe 'Output' {
 
         It 'Does not convert current directory relative path to absolute when relative is requested' {
             Set-Location $script:basePath
-            $expectedPath = Join-Path -Path '.' -ChildPath $innerDirectoryName -AdditionalChildPath $projectName
+            $expectedPath = Join-Path -Path $innerDirectoryName -ChildPath $projectName
 
             Get-DotnetTargetFramework -Path '.' -ShowRelative
             $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
@@ -102,7 +102,7 @@ Describe 'Output' {
         It 'Does not convert current directory prefixed relative path to absolute when relative is requested' {
             Set-Location $script:basePath
             $path = Join-Path -Path '.' -ChildPath $innerDirectoryName
-            $expectedPath = Join-Path -Path '.' -ChildPath $innerDirectoryName -AdditionalChildPath $projectName
+            $expectedPath = $projectName
 
             Get-DotnetTargetFramework -Path $path -ShowRelative
             $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
@@ -114,7 +114,7 @@ Describe 'Output' {
 
         It 'Does not convert parent directory relative path to absolute when relative is requested' {
             Set-Location $innerDirectoryPath
-            $expectedPath = Join-Path -Path '..' -ChildPath $innerDirectoryName -AdditionalChildPath $projectName
+            $expectedPath = Join-Path -Path $innerDirectoryName -ChildPath $projectName
 
             Get-DotnetTargetFramework -Path '..' -ShowRelative
             $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
@@ -127,7 +127,7 @@ Describe 'Output' {
         It 'Does not convert parent directory prefixed relative path to absolute when relative is requested' {
             Set-Location $innerDirectoryPath
             $path = Join-Path -Path '..' -ChildPath $innerDirectoryName
-            $expectedPath = Join-Path -Path '..' -ChildPath $innerDirectoryName -AdditionalChildPath $projectName
+            $expectedPath = $projectName
 
             Get-DotnetTargetFramework -Path $path -ShowRelative
             $writeHostInvocationLines = ($writeHostInvocations -join '') -split '`n'
@@ -184,13 +184,13 @@ Describe 'Output' {
             New-MSBuildFile -Path $outdatedPropertiesPath -Contents '<TargetFrameworks>netcoreapp3.1;net5.0-windows</TargetFrameworks>'
 
             $currentProjectPath = Join-Path -Path $script:basePath -ChildPath 'Current.csproj'
-            New-MSBuildFile -Path $currentProjectPath -Contents '<TargetFramework>net6.0</TargetFramework>'
+            New-MSBuildFile -Path $currentProjectPath -Contents '<TargetFramework>net8.0</TargetFramework>'
 
             $currentFrameworkProjectPath = Join-Path -Path $script:basePath -ChildPath 'CurrentFramework.csproj'
             New-MSBuildFile -Path $currentFrameworkProjectPath -Contents '<TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>'
 
             $currentPropertiesPath = Join-Path -Path $script:basePath -ChildPath 'Current.props'
-            New-MSBuildFile -Path $currentPropertiesPath -Contents '<TargetFrameworks>net6.0-android;net7.0</TargetFrameworks>'
+            New-MSBuildFile -Path $currentPropertiesPath -Contents '<TargetFrameworks>net8.0-android;net9.0</TargetFrameworks>'
 
             Mock Write-Host -ModuleName Lance
 
@@ -222,7 +222,7 @@ Describe 'Output' {
         }
 
         It 'Writes current versions using green font' {
-            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $ForegroundColor -eq 'Green' -and $Object -eq 'net6.0' }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $ForegroundColor -eq 'Green' -and $Object -eq 'net8.0' }
 
             Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $ForegroundColor -eq 'Green' -and
@@ -231,10 +231,10 @@ Describe 'Output' {
 
             Should -Invoke Write-Host -ModuleName Lance -ParameterFilter {
                 $ForegroundColor -eq 'Green' -and
-                $Object -eq 'net6.0-android'
+                $Object -eq 'net8.0-android'
             }
 
-            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $ForegroundColor -eq 'Green' -and $Object -eq 'net7.0' }
+            Should -Invoke Write-Host -ModuleName Lance -ParameterFilter { $ForegroundColor -eq 'Green' -and $Object -eq 'net9.0' }
         }
     }
 
@@ -384,6 +384,52 @@ Describe 'Output' {
             $writeHostInvocationLines[2] | Should -Be "netstandard2.1: $standardProjectPath"
             $writeHostInvocationLines[3] | Should -Be "v4.8.1:         $frameworkProjectPath"
             $writeHostInvocationLines[4] | Should -Be ''
+        }
+    }
+
+    Context 'Json Format' {
+        BeforeEach {
+            $coreProjectPath = Join-Path -Path $script:basePath -ChildPath '1.csproj'
+            New-MSBuildFile -Path $coreProjectPath -Contents '<TargetFramework>net8.0</TargetFramework>'
+
+            $frameworkProjectPath = Join-Path -Path $script:basePath -ChildPath '2.csproj'
+            New-MSBuildFile -Path $frameworkProjectPath -Contents '<TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>'
+
+            $propertiesPath = Join-Path -Path $script:basePath -ChildPath '3.props'
+            New-MSBuildFile -Path $propertiesPath -Contents '<TargetFrameworks>net8.0-android;net7.0</TargetFrameworks>'
+
+            $script:output = Get-DotnetTargetFramework -Path $script:basePath -Format 'Json' |
+                ConvertFrom-Json
+        }
+
+        It 'Outputs array of all projects' {
+            $output.Count | Should -Be 3
+        }
+
+        It 'Outputs core project with a single target version' {
+            $project = $output[0]
+            $project.path | Should -Be $coreProjectPath
+            $project.targetFrameworks.Count | Should -Be 1
+            $project.targetFrameworks[0].value | Should -Be 'net8.0'
+            $project.targetFrameworks[0].supported | Should -Be $true
+        }
+
+        It 'Outputs framework project with a single target version' {
+            $project = $output[1]
+            $project.path | Should -Be $frameworkProjectPath
+            $project.targetFrameworks.Count | Should -Be 1
+            $project.targetFrameworks[0].value | Should -Be 'v4.5.2'
+            $project.targetFrameworks[0].supported | Should -Be $false
+        }
+
+        It 'Outputs core project with multiple target versions' {
+            $project = $output[2]
+            $project.path | Should -Be $propertiesPath
+            $project.targetFrameworks.Count | Should -Be 2
+            $project.targetFrameworks[0].value | Should -Be 'net8.0-android'
+            $project.targetFrameworks[0].supported | Should -Be $true
+            $project.targetFrameworks[1].value | Should -Be 'net7.0'
+            $project.targetFrameworks[1].supported | Should -Be $false
         }
     }
 
