@@ -154,7 +154,8 @@ function Get-DotnetTargetFramework {
             'netstandard2\.0', # .NET Standard for .NET Core & .NET Framework
             'netstandard2\.1', # .NET Standard for .NET Core Only
             'net8\.0.*', # LTS until 2026-11-10
-            'net9\.0.*', # STS until 2026-05-12
+            'net9\.0.*', # STS until 2026-11-10
+            'net10\.0.*', # LTS until 2028-11-14
             'v4\.6\.2', # Until 2027-01-12
             'v4\.7.*',
             'v4\.8.*'
