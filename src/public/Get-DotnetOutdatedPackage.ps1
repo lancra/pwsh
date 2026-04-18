@@ -103,6 +103,8 @@ function Get-DotnetOutdatedPackage {
         $packagesResults = $jobs |
             ForEach-Object {
                 $jsonLines = Receive-Job -Job $_
+                Remove-Job -Job $_
+
                 $json = $jsonLines -join "`n"
                 $jsonObject = $json | ConvertFrom-Json
                 [DotnetPackageListResult]::new($jsonObject)
